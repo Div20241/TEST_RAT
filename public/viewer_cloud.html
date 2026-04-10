@@ -320,6 +320,7 @@
     <script>
         let socket;
         let isConnecting = false;
+        let connectAttempt = 0;
         let isStreaming = false;
         let frameCount = 0;
         let lastFPS = Date.now();
@@ -408,6 +409,16 @@
             logEl.scrollTop = logEl.scrollHeight;
         }
 
+        function safeSendJSON(payload) {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return false;
+            try {
+                socket.send(JSON.stringify(payload));
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
         document.getElementById('connect-btn').onclick = () => {
             const connectBtn = document.getElementById('connect-btn');
             const url = document.getElementById('relay-url').value;
@@ -422,25 +433,23 @@
             connectBtn.disabled = true;
             connectBtn.textContent = 'Connecting...';
 
-            if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
                 try { socket.close(); } catch {}
             }
 
             const ws = new WebSocket(url);
             ws.binaryType = 'arraybuffer';
             socket = ws;
+            const myAttempt = ++connectAttempt;
 
             ws.onopen = () => {
-                statusBox.classList.add('connected');
-                statusBox.querySelector('span:last-child').innerText = 'CLOUD CONNECTED';
+                if (myAttempt !== connectAttempt || socket !== ws) return;
                 try {
                     ws.send(JSON.stringify({ type: 'register', role: 'viewer', targetId: id, password: pass }));
                 } catch (err) {
                     appendLog(`Register failed: ${err?.message || err}`, 'error');
+                    try { ws.close(); } catch {}
                 }
-                isConnecting = false;
-                connectBtn.disabled = false;
-                connectBtn.textContent = 'Establish Uplink';
             };
 
             ws.onmessage = async (event) => {
@@ -460,7 +469,10 @@
 
                 const data = JSON.parse(event.data);
                 if (data.type === 'registered') {
+                    if (myAttempt !== connectAttempt || socket !== ws) return;
                     appendLog("Access Authorized. Tethering established.");
+                    statusBox.classList.add('connected');
+                    statusBox.querySelector('span:last-child').innerText = 'CLOUD CONNECTED';
                     if (data.width) {
                         canvas.width = data.width;
                         canvas.height = data.height;
@@ -470,6 +482,9 @@
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('main-ui').classList.remove('hidden');
                     requestDir(currentPath);
+                    isConnecting = false;
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = 'Establish Uplink';
                 } else if (data.type === 'stream_info') {
                     if (data.width && data.height) {
                         canvas.width = data.width;
@@ -480,7 +495,12 @@
                     }
                 } else if (data.type === 'file_list') renderFileList(data.path, data.items);
                 else if (data.type === 'clipboard_data') document.getElementById('clipboard-text').value = data.content;
-                else if (data.type === 'error') appendLog(data.message, 'error');
+                else if (data.type === 'error') {
+                    appendLog(data.message, 'error');
+                    isConnecting = false;
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = 'Establish Uplink';
+                }
             };
 
             ws.onerror = () => {
@@ -490,13 +510,13 @@
                 connectBtn.textContent = 'Establish Uplink';
             };
 
-            ws.onclose = () => {
+            ws.onclose = (ev) => {
                 statusBox.classList.remove('connected');
                 statusBox.querySelector('span:last-child').innerText = 'OFFLINE';
                 isStreaming = false;
                 document.getElementById('stream-btn').innerText = 'Initiate Stream';
                 document.getElementById('stream-btn').className = 'btn btn-primary';
-                appendLog('Connection closed.', 'error');
+                appendLog(`Connection closed (code=${ev.code}).`, 'error');
                 isConnecting = false;
                 connectBtn.disabled = false;
                 connectBtn.textContent = 'Establish Uplink';
