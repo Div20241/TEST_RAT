@@ -8,272 +8,279 @@
     <style>
         :root {
             --bg: #05070a;
-            --surface: rgba(17, 20, 28, 0.85);
+            --surface: rgba(12, 14, 22, 0.92);
             --accent: #00f2ff;
-            --accent-glow: rgba(0, 242, 255, 0.3);
+            --accent-glow: rgba(0, 242, 255, 0.25);
             --secondary: #7c4dff;
             --success: #00e676;
+            --warning: #ffab40;
             --danger: #ff5252;
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --border: rgba(255, 255, 255, 0.08);
-            --glass: rgba(255, 255, 255, 0.03);
+            --text-primary: #f0f4f8;
+            --text-secondary: #7b8ca8;
+            --border: rgba(255, 255, 255, 0.07);
         }
 
-        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.06) transparent; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 0% 0%, #101827 0%, #05070a 100%);
+            background: #05070a;
             color: var(--text-primary);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
 
-        /* Glassmorphism Container */
+        .bg-mesh {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .bg-orb {
+            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 20s ease-in-out infinite alternate;
+        }
+        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
+        .bg-orb:nth-child(2) { width: 500px; height: 500px; background: var(--secondary); bottom: -20%; right: -8%; animation-delay: -7s; animation-duration: 25s; }
+        .bg-orb:nth-child(3) { width: 350px; height: 350px; background: #e040fb; top: 50%; left: 40%; animation-delay: -12s; animation-duration: 30s; opacity: 0.06; }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(40px, -30px) scale(1.08); }
+            100% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
         .glass-container {
-            width: 95%;
-            max-width: 1200px;
-            margin: 40px auto;
+            position: relative; z-index: 1;
+            width: 96%; max-width: 1440px; margin: 24px auto;
             background: var(--surface);
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(24px) saturate(1.4);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
-            animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 28px;
+            padding: 1.8rem 2rem;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
+            animation: containerIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes containerIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.6rem; padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 1rem;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 600;
-            background: linear-gradient(90deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.35rem; font-weight: 600; letter-spacing: 1px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--secondary) 100%);
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 10px;
         }
+        .logo svg { filter: drop-shadow(0 0 6px var(--accent-glow)); }
 
         .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 30px;
-            background: rgba(0,0,0,0.3);
-            font-size: 0.85rem;
-            font-weight: 500;
-            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 16px; border-radius: 30px;
+            background: rgba(0,0,0,0.35); font-size: 0.78rem; font-weight: 500;
+            border: 1px solid var(--border); backdrop-filter: blur(8px);
+            transition: all 0.4s;
         }
-
         .status-dot {
-            height: 10px; width: 10px;
-            background-color: #444;
-            border-radius: 50%;
-            transition: 0.3s;
+            height: 9px; width: 9px; background: #333; border-radius: 50%; transition: 0.4s;
         }
-
-        .connected .status-dot { 
-            background-color: var(--success); 
-            box-shadow: 0 0 12px var(--success); 
+        .connected .status-dot {
+            background: var(--success); box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s ease-in-out infinite;
         }
+        .connected { border-color: rgba(0,230,118,0.2); }
 
-        /* Input Styles */
-        .input-group {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin: 4rem 0;
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 6px var(--success); }
+            50% { box-shadow: 0 0 18px var(--success), 0 0 30px rgba(0,230,118,0.15); }
         }
 
         input, select, textarea {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            color: white;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.3s;
+            background: rgba(0,0,0,0.35); border: 1px solid var(--border);
+            color: white; padding: 11px 16px; border-radius: 12px;
+            font-size: 0.9rem; outline: none; transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
         }
-
-        input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(0,242,255,0.08);
         }
 
         .btn {
-            cursor: pointer;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: 600;
-            border: none;
+            cursor: pointer; padding: 11px 22px; border-radius: 12px;
+            font-weight: 600; border: none; font-size: 0.82rem;
+            text-transform: uppercase; letter-spacing: 0.8px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.85rem;
+            font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;
         }
-
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), var(--secondary));
-            color: #000;
-            font-weight: 700;
+            color: #000; font-weight: 700;
             box-shadow: 0 4px 20px var(--accent-glow);
         }
-
         .btn-primary:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 30px var(--accent-glow);
-            filter: brightness(1.2);
+            transform: translateY(-2px); filter: brightness(1.15);
+            box-shadow: 0 8px 35px var(--accent-glow);
         }
+        .btn-primary:active { transform: translateY(0); filter: brightness(0.95); }
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #d32f2f);
+            color: white; box-shadow: 0 4px 15px rgba(255,82,82,0.3);
+        }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,82,82,0.4); }
 
-        .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); }
-        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 82, 82, 0.5); }
-
-        /* Main Dashboard Grid */
         .dashboard-grid {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 24px;
+            display: grid; grid-template-columns: 310px 1fr; gap: 20px;
         }
 
         .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            display: flex; flex-direction: column; gap: 14px;
+            max-height: calc(100vh - 140px); overflow-y: auto; padding-right: 4px;
         }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
 
         .card {
-            background: rgba(0,0,0,0.25);
-            border-radius: 18px;
-            padding: 20px;
+            background: rgba(0,0,0,0.22);
+            border-radius: 16px; padding: 16px;
             border: 1px solid var(--border);
+            transition: border-color 0.4s, box-shadow 0.4s;
+            animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+        }
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+        .card:nth-child(4) { animation-delay: 0.2s; }
+        .card:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateX(-12px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .card:hover {
+            border-color: rgba(0,242,255,0.15);
+            box-shadow: 0 0 30px rgba(0,242,255,0.04);
         }
 
         .card-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.68rem; text-transform: uppercase;
+            color: var(--text-secondary); margin-bottom: 12px;
+            font-weight: 600; letter-spacing: 1.4px;
+            display: flex; align-items: center; gap: 8px;
         }
 
         .stat-value {
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--success);
+            font-size: 2.2rem; font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--success), var(--accent));
+            background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 8px rgba(0,230,118,0.2));
+            transition: filter 0.3s;
         }
 
-        /* Stream Viewport */
+        .stat-cell {
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px; padding: 8px 6px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .stat-cell:hover {
+            border-color: rgba(0,242,255,0.12);
+            background: rgba(0,242,255,0.03);
+        }
+        .stat-cell-label {
+            font-size: 0.55rem; text-transform: uppercase;
+            letter-spacing: 1.2px; color: var(--text-secondary); margin-bottom: 3px;
+        }
+        .stat-cell-value {
+            font-size: 0.8rem; font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent); transition: color 0.3s;
+        }
+
         .viewport-container {
-            position: relative;
-            background: #000;
-            border-radius: 20px;
-            overflow: hidden;
+            position: relative; background: #000;
+            border-radius: 20px; overflow: hidden;
             border: 1px solid var(--border);
-            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 20px 60px rgba(0,0,0,0.5);
             aspect-ratio: 16/9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+        .viewport-container.streaming {
+            border-color: rgba(0,242,255,0.15);
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,242,255,0.06);
         }
 
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-        }
+        canvas { width: 100%; height: 100%; display: block; }
 
         .viewport-overlay {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 8px 14px;
-            border-radius: 10px;
-            backdrop-filter: blur(5px);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            border: 1px solid rgba(255,255,255,0.1);
+            position: absolute; top: 16px; right: 16px;
+            background: rgba(0,0,0,0.55); padding: 6px 12px;
+            border-radius: 8px; backdrop-filter: blur(8px);
+            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-secondary); letter-spacing: 1px;
         }
 
-        /* Remote Explorer */
         .explorer {
-            max-height: 250px;
-            overflow-y: auto;
-            margin-top: 10px;
-            padding-right: 5px;
+            max-height: 220px; overflow-y: auto; margin-top: 8px; padding-right: 4px;
         }
-
-        .explorer::-webkit-scrollbar { width: 5px; }
-        .explorer::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        .explorer::-webkit-scrollbar { width: 3px; }
+        .explorer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
 
         .file-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s;
+            font-size: 0.82rem; margin-bottom: 2px;
         }
-
         .file-item:hover {
-            background: rgba(124, 77, 255, 0.1);
-            color: var(--accent);
+            background: rgba(124, 77, 255, 0.08); color: var(--accent);
+            transform: translateX(3px);
         }
 
-        /* Console Log Phrases */
         .console {
-            margin-top: 20px;
-            background: #000;
-            border-radius: 12px;
-            padding: 15px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            height: 100px;
-            overflow-y: auto;
-            border: 1px solid var(--border);
+            margin-top: 16px; background: rgba(0,0,0,0.6);
+            border-radius: 14px; padding: 14px 16px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+            color: var(--text-secondary); height: 100px;
+            overflow-y: auto; border: 1px solid var(--border);
+            line-height: 1.6; position: relative;
+        }
+        .console::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--secondary), transparent);
+            opacity: 0.3;
+        }
+
+        input[type=range] {
+            width: 100%; accent-color: var(--accent); height: 4px;
+            -webkit-appearance: none; appearance: none;
+            background: rgba(255,255,255,0.06); border-radius: 4px; border: none; outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 14px; height: 14px;
+            border-radius: 50%; background: var(--accent);
+            box-shadow: 0 0 8px var(--accent-glow);
+            cursor: pointer; border: 2px solid rgba(0,0,0,0.3);
         }
 
         .hidden { display: none !important; }
 
-        /* Range Input Styling */
-        input[type=range] {
-            width: 100%;
-            accent-color: var(--accent);
-            height: 6px;
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .sidebar { max-height: none; overflow-y: visible; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-mesh"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
 
     <div class="glass-container">
         <div class="header">
@@ -288,14 +295,20 @@
 
         <!-- Login / Entry Section -->
         <div id="login-section">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-weight: 300; margin-bottom: 0.5rem;">Access Remote Terminal</h1>
-                <p style="color: var(--text-secondary);">Secure encrypted connection required</p>
+            <div style="text-align:center; margin-bottom:2.5rem;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="url(#grad1)" stroke-width="1.5" style="margin-bottom:16px;">
+                    <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--accent)"/><stop offset="100%" style="stop-color:var(--secondary)"/></linearGradient></defs>
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <h1 style="font-weight:300; margin:0 0 8px;">Access Remote Terminal</h1>
+                <p style="color:var(--text-secondary); margin:0;">Secure encrypted connection required</p>
             </div>
-            <div class="input-group">
-                <input type="text" id="target-id" placeholder="Agent ID" value="PC_REMOTO_01">
-                <input type="password" id="agent-password" placeholder="Key Phrase">
-                <button id="connect-btn" class="btn btn-primary">Establish Uplink</button>
+            <div style="max-width:420px; margin:0 auto; display:flex; flex-direction:column; gap:10px;">
+                <label style="font-size:0.7rem; color:var(--text-secondary); letter-spacing:0.5px;">AGENT ID</label>
+                <input type="text" id="target-id" placeholder="PC_REMOTO_01" value="PC_REMOTO_01">
+                <label style="font-size:0.7rem; color:var(--text-secondary); letter-spacing:0.5px;">KEYPHRASE</label>
+                <input type="password" id="agent-password" placeholder="Enter passkey...">
+                <button id="connect-btn" class="btn btn-primary" style="margin-top:8px;">Establish Uplink</button>
             </div>
         </div>
 
@@ -304,36 +317,114 @@
             <div class="dashboard-grid">
                 <!-- Sidebar Controls -->
                 <div class="sidebar">
+
+                    <div class="card">
+                        <div class="card-title">🎬 Stream Controls</div>
+                        <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-bottom:6px;">ENGINE PRESET</label>
+                        <select id="stream-preset" style="width:100%; margin-bottom:12px;">
+                            <option value="fluid" selected>FLUID FIRST (recommended)</option>
+                            <option value="balanced">BALANCED</option>
+                            <option value="quality">QUALITY FIRST</option>
+                        </select>
+                        <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-bottom:6px;">STREAM PROFILE (manual)</label>
+                        <select id="res-mode" style="width:100%; margin-bottom:14px;">
+                            <option value="performance" selected>PERFORMANCE (High FPS)</option>
+                            <option value="ultra">ULTRA (Max FPS)</option>
+                            <option value="quality">QUALITY (Best detail)</option>
+                            <option value="auto_native">AUTO NATIVE (Host 100%)</option>
+                        </select>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                            <div>
+                                <label style="font-size:0.65rem; color:var(--text-secondary);">TARGET KB/frame</label>
+                                <input type="range" id="adaptive-target-kb" min="16" max="80" value="32">
+                                <div id="adaptive-target-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">32 KB/frame</div>
+                            </div>
+                            <div>
+                                <label style="font-size:0.65rem; color:var(--text-secondary);">JPEG QUALITY</label>
+                                <input type="range" id="quality-range" min="10" max="95" value="65">
+                                <div id="quality-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">65%</div>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <label style="font-size:0.65rem; color:var(--text-secondary);">HOST SCALE</label>
+                            <input type="range" id="manual-scale" min="30" max="100" value="100">
+                            <div id="manual-scale-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">100% (native host)</div>
+                        </div>
+                        <label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:0.68rem; color:var(--text-secondary);">
+                            <input type="checkbox" id="adaptive-enabled" style="accent-color:var(--accent);"> Adaptive autoscale (optional)
+                        </label>
+                        <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-top:10px; margin-bottom:6px;">DISPLAY MODE</label>
+                        <select id="display-mode" style="width:100%;">
+                            <option value="contain">Fit (keep aspect)</option>
+                            <option value="cover">Fill (crop)</option>
+                            <option value="stretch">Stretch</option>
+                            <option value="pixel">1:1 Pixel</option>
+                        </select>
+                        <button id="stream-btn" class="btn btn-primary" style="width:100%; margin-top:16px;">Initiate Stream</button>
+                    </div>
+
                     <div class="card">
                         <div class="card-title">🚀 Performance</div>
-                        <div class="stat-value"><span id="fps-counter">0</span> <span style="font-size: 0.8rem; color: var(--text-secondary)">FPS</span></div>
-                        
-                        <div style="margin-top: 20px;">
-                            <label style="display:block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px;">UPLINK QUALITY</label>
-                            <select id="res-mode" style="width:100%; margin-bottom: 12px;">
-                                <option value="performance">TURBO (480p / High-Speed)</option>
-                                <option value="quality">HD (720p / Native)</option>
-                            </select>
-                            <input type="range" id="quality-range" min="10" max="95" value="75">
+                        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+                            <div class="stat-value"><span id="fps-counter">0</span></div>
+                            <small style="font-size:0.85rem; opacity:0.5;">FPS</small>
+                            <div id="stream-meta" style="margin-left:auto; font-size:0.68rem; color:var(--text-secondary); font-family:'JetBrains Mono',monospace; background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:8px;">IDLE</div>
                         </div>
-                        
-                        <button id="stream-btn" class="btn btn-primary" style="width:100%; margin-top: 20px;">Initiate Stream</button>
+                        <div id="net-stats" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px;">
+                            <div class="stat-cell"><div class="stat-cell-label">RTT</div><div class="stat-cell-value" id="st-rtt">-</div></div>
+                            <div class="stat-cell"><div class="stat-cell-label">LOSS</div><div class="stat-cell-value" id="st-loss">0%</div></div>
+                            <div class="stat-cell"><div class="stat-cell-label">DROP</div><div class="stat-cell-value" id="st-drop">0</div></div>
+                            <div class="stat-cell"><div class="stat-cell-label">RX</div><div class="stat-cell-value" id="st-rx">0</div></div>
+                            <div class="stat-cell"><div class="stat-cell-label">TX</div><div class="stat-cell-value" id="st-tx">0</div></div>
+                            <div class="stat-cell"><div class="stat-cell-label">BUF</div><div class="stat-cell-value" id="st-buf">0 B</div></div>
+                        </div>
+                        <div id="st-pkt" style="margin-top:6px; font-size:0.62rem; color:var(--text-secondary); font-family:'JetBrains Mono',monospace; padding:4px 0; opacity:0.7;"></div>
                     </div>
 
                     <div class="card">
-                        <div class="card-title">📁 Remote Nexus</div>
-                        <div id="current-path" style="font-size: 0.7rem; color: var(--accent); margin-bottom: 10px; font-family: monospace;">C:\</div>
-                        <div class="explorer" id="file-list">
-                            <!-- Files populated here -->
+                        <div class="card-title" style="margin-bottom:10px;">🔬 Packet Trace</div>
+                        <div style="display:flex; align-items:center; justify-content:space-between;">
+                            <label style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--text-secondary); cursor:pointer;">
+                                <input type="checkbox" id="trace-flag" style="accent-color:var(--accent);"> Enable
+                            </label>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <label style="font-size:0.65rem; color:var(--text-secondary);">Sort:</label>
+                                <select id="trace-sort" style="padding:3px 6px; font-size:0.65rem; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:white; border-radius:6px;">
+                                    <option value="recent">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                    <option value="static">Static</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="trace-diff" style="margin-top:6px; font-size:0.65rem; color:var(--text-secondary); font-family:monospace; padding:4px 0;">TRACE DIFF: OFF</div>
+                        <div id="trace-types" style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px; max-height:60px; overflow:auto;"></div>
+                        <div style="margin-top:8px; max-height:150px; overflow:auto; border:1px solid var(--border); border-radius:10px; background:rgba(0,0,0,0.15);">
+                            <table style="width:100%; border-collapse:collapse; font-size:0.64rem; font-family:'JetBrains Mono',monospace;">
+                                <thead>
+                                    <tr style="background:rgba(255,255,255,0.04); position:sticky; top:0;">
+                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Time</th>
+                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Dir</th>
+                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Type</th>
+                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Content</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trace-table-body"></tbody>
+                            </table>
                         </div>
                     </div>
 
                     <div class="card">
-                        <div class="card-title">📋 Data Buffer</div>
-                        <textarea id="clipboard-text" style="width:100%; height:60px; margin-bottom:12px; font-size: 0.8rem;" placeholder="Remote clipboard..."></textarea>
+                        <div class="card-title">📁 Remote Explorer</div>
+                        <div id="current-path" style="font-size:0.7rem; color:var(--accent); margin-bottom:10px; font-family:monospace;">C:\</div>
+                        <div class="explorer" id="file-list"></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📋 Clipboard</div>
+                        <textarea id="clipboard-text" style="width:100%; height:55px; margin-bottom:10px; font-size:0.8rem;" placeholder="Remote clipboard..."></textarea>
                         <div style="display:flex; gap:8px">
-                            <button id="get-clip-btn" class="btn" style="flex:1; background: rgba(255,255,255,0.05);">Pull</button>
-                            <button id="set-clip-btn" class="btn" style="flex:1; background: rgba(255,255,255,0.05);">Push</button>
+                            <button id="get-clip-btn" class="btn" style="flex:1; background:rgba(255,255,255,0.05);">Pull</button>
+                            <button id="set-clip-btn" class="btn" style="flex:1; background:rgba(255,255,255,0.05);">Push</button>
                         </div>
                     </div>
                 </div>
@@ -359,12 +450,35 @@
     </div>
 
     <script>
-        const socketUrl = `ws://${window.location.host}`;
-        let socket;
+        const socketUrl = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`;
+        let socket = null;
         let isStreaming = false;
+        let isConnecting = false;
+        let connectAttempt = 0;
+        let pendingRegister = null;
         let currentPath = "C:\\";
         let frameCount = 0;
         let lastFPSUpdate = Date.now();
+        let latestBinaryFrame = null;
+        let isRenderingBinaryFrame = false;
+        const STREAM_MAGIC = 0xA17EC0DE;
+        let expectedFrameSeq = null;
+        let receivedFrames = 0;
+        let lostFrames = 0;
+        let recvBytes = 0;
+        let recvBytesLast = 0;
+        let rttMs = null;
+        let relayBuffered = 0;
+        let relayDropped = 0;
+        let relayTxKbps = 0;
+        let packetTypePps = {};
+        let traceEnabled = false;
+        let traceRows = [];
+        let traceCompare = null;
+        let traceSelectedType = 'all';
+        let traceSortMode = 'recent';
+        const clientId = Math.random().toString(36).slice(2);
+        let pingSeq = 0;
 
         const logEl = document.getElementById('log');
         const statusEl = document.getElementById('connection-status');
@@ -372,8 +486,26 @@
         const loginSection = document.getElementById('login-section');
         const canvas = document.getElementById('remote-screen');
         const placeholder = document.getElementById('stream-placeholder');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
         const fpsCounter = document.getElementById('fps-counter');
+        const streamMetaEl = document.getElementById('stream-meta');
+        const netStatsEl = document.getElementById('net-stats');
+        const traceFlagEl = document.getElementById('trace-flag');
+        const adaptiveTargetEl = document.getElementById('adaptive-target-kb');
+        const adaptiveTargetLabelEl = document.getElementById('adaptive-target-label');
+        const qualityRangeEl = document.getElementById('quality-range');
+        const qualityLabelEl = document.getElementById('quality-label');
+        const manualScaleEl = document.getElementById('manual-scale');
+        const manualScaleLabelEl = document.getElementById('manual-scale-label');
+        const adaptiveEnabledEl = document.getElementById('adaptive-enabled');
+        const streamPresetEl = document.getElementById('stream-preset');
+        const displayModeEl = document.getElementById('display-mode');
+        const traceSortEl = document.getElementById('trace-sort');
+        const traceTypesEl = document.getElementById('trace-types');
+        const traceTableBodyEl = document.getElementById('trace-table-body');
+        const traceDiffEl = document.getElementById('trace-diff');
+        const connectBtn = document.getElementById('connect-btn');
+        let selectedMode = 'performance';
 
         function appendLog(msg, type='info') {
             const color = type === 'error' ? 'var(--danger)' : 'var(--text-secondary)';
@@ -381,66 +513,253 @@
             logEl.scrollTop = logEl.scrollHeight;
         }
 
-        function initWebSocket() {
-            socket = new WebSocket(socketUrl);
-            socket.binaryType = 'blob';
-            
-            socket.onopen = () => {
+        function updateStreamMeta(text) {
+            if (streamMetaEl) streamMetaEl.textContent = text || 'IDLE';
+        }
+
+        const stRtt = document.getElementById('st-rtt');
+        const stLoss = document.getElementById('st-loss');
+        const stDrop = document.getElementById('st-drop');
+        const stRx = document.getElementById('st-rx');
+        const stTx = document.getElementById('st-tx');
+        const stBuf = document.getElementById('st-buf');
+        const stPkt = document.getElementById('st-pkt');
+
+        function applyDisplayMode(mode) {
+            if (!canvas) return;
+            canvas.style.objectPosition = 'center center';
+            if (mode === 'cover') {
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.objectFit = 'cover';
+                canvas.style.imageRendering = 'auto';
+                return;
+            }
+            if (mode === 'stretch') {
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                canvas.style.objectFit = 'fill';
+                canvas.style.imageRendering = 'auto';
+                return;
+            }
+            if (mode === 'pixel') {
+                canvas.style.width = 'auto';
+                canvas.style.height = 'auto';
+                canvas.style.maxWidth = '100%';
+                canvas.style.maxHeight = '100%';
+                canvas.style.objectFit = 'none';
+                canvas.style.imageRendering = 'pixelated';
+                return;
+            }
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.objectFit = 'contain';
+            canvas.style.imageRendering = 'auto';
+        }
+
+        function formatBytes(n) {
+            if (n < 1024) return `${n} B`;
+            if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+            return `${(n / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        function updateNetStats() {
+            const total = receivedFrames + lostFrames;
+            const lossPct = total > 0 ? ((lostFrames / total) * 100) : 0;
+            const rxKbps = ((recvBytes - recvBytesLast) * 8) / 1000;
+            recvBytesLast = recvBytes;
+
+            stRtt.textContent = rttMs == null ? '-' : rttMs.toFixed(1) + ' ms';
+            stLoss.textContent = lossPct.toFixed(1) + '%';
+            stLoss.style.color = lossPct > 2 ? 'var(--danger)' : 'var(--accent)';
+            stDrop.textContent = relayDropped;
+            stDrop.style.color = relayDropped > 0 ? 'var(--danger)' : 'var(--accent)';
+            stRx.textContent = rxKbps >= 1000 ? (rxKbps / 1000).toFixed(1) + ' Mbps' : rxKbps.toFixed(0) + ' kbps';
+            stTx.textContent = relayTxKbps >= 1000 ? (relayTxKbps / 1000).toFixed(1) + ' Mbps' : relayTxKbps.toFixed(0) + ' kbps';
+            stBuf.textContent = formatBytes(relayBuffered);
+            stBuf.style.color = relayBuffered > 65536 ? 'var(--danger)' : 'var(--accent)';
+
+            const topTypes = Object.entries(packetTypePps)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 4)
+                .map(([k, v]) => `${k}: ${v}/s`)
+                .join('  ');
+            stPkt.textContent = topTypes || '';
+        }
+
+        function renderTraceTypes() {
+            const counts = {};
+            traceRows.forEach((r) => {
+                const k = r.type || 'unknown';
+                counts[k] = (counts[k] || 0) + 1;
+            });
+            const types = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+            const chips = [`<button data-trace-type="all" style="padding:3px 6px; border-radius:6px; border:1px solid var(--border); background:${traceSelectedType === 'all' ? 'rgba(0,242,255,0.2)' : 'rgba(255,255,255,0.03)'}; color:var(--text-secondary); cursor:pointer;">all (${traceRows.length})</button>`];
+            types.forEach((t) => {
+                const active = traceSelectedType === t;
+                chips.push(`<button data-trace-type="${t}" style="padding:3px 6px; border-radius:6px; border:1px solid var(--border); background:${active ? 'rgba(0,242,255,0.2)' : 'rgba(255,255,255,0.03)'}; color:var(--text-secondary); cursor:pointer;">${t} (${counts[t]})</button>`);
+            });
+            traceTypesEl.innerHTML = chips.join('');
+            traceTypesEl.querySelectorAll('button[data-trace-type]').forEach((btn) => {
+                btn.onclick = () => {
+                    traceSelectedType = btn.getAttribute('data-trace-type') || 'all';
+                    renderTraceRows();
+                    renderTraceTypes();
+                };
+            });
+        }
+
+        function renderTraceRows() {
+            let rows = traceRows;
+            if (traceSelectedType !== 'all') rows = rows.filter((r) => (r.type || 'unknown') === traceSelectedType);
+            if (traceSortMode === 'recent') rows = [...rows].sort((a, b) => b.ts - a.ts);
+            else if (traceSortMode === 'oldest') rows = [...rows].sort((a, b) => a.ts - b.ts);
+            rows = rows.slice(0, 40);
+            traceTableBodyEl.innerHTML = rows.map((r) => {
+                const t = new Date(r.ts).toLocaleTimeString();
+                const preview = (r.preview || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                return `<tr>
+                    <td style="padding:3px 4px;">${t}</td>
+                    <td style="padding:3px 4px;">${r.dir || '-'}</td>
+                    <td style="padding:3px 4px;">${r.type || '-'}</td>
+                    <td style="padding:3px 4px; white-space: nowrap; max-width: 240px; overflow: hidden; text-overflow: ellipsis;">${preview}</td>
+                </tr>`;
+            }).join('');
+            if (!traceCompare) {
+                traceDiffEl.textContent = 'TRACE DIFF: OFF';
+            } else {
+                traceDiffEl.textContent =
+                    `TRACE DIFF fps:${traceCompare.diff_tx_fps} kbps:${traceCompare.diff_tx_kbps} drop/s:${traceCompare.diff_dropped_per_s}`;
+            }
+        }
+
+        function safeSendJSON(payload) {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return false;
+            try {
+                socket.send(JSON.stringify(payload));
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        function detectMimeType(bytes) {
+            if (bytes.length >= 3 && bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) return 'image/jpeg';
+            if (
+                bytes.length >= 12 &&
+                bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+                bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+            ) return 'image/webp';
+            return 'application/octet-stream';
+        }
+
+        function scheduleFrameRender() {
+            if (isRenderingBinaryFrame) return;
+            isRenderingBinaryFrame = true;
+            requestAnimationFrame(renderLatestFrame);
+        }
+
+        async function renderLatestFrame() {
+            const frame = latestBinaryFrame;
+            latestBinaryFrame = null;
+            if (!frame) {
+                isRenderingBinaryFrame = false;
+                return;
+            }
+
+            try {
+                const view = new DataView(frame);
+                let offset = 0;
+                let tileCount;
+                if (view.byteLength >= 12 && view.getUint32(0) === STREAM_MAGIC) {
+                    const seq = view.getUint32(4);
+                    if (expectedFrameSeq !== null && seq > expectedFrameSeq) {
+                        lostFrames += (seq - expectedFrameSeq);
+                    }
+                    expectedFrameSeq = (seq + 1) >>> 0;
+                    receivedFrames += 1;
+                    offset = 12;
+                    tileCount = view.getUint16(offset);
+                    offset += 2;
+                } else {
+                    tileCount = view.getUint16(offset);
+                    offset += 2;
+                    receivedFrames += 1;
+                }
+
+                for (let i = 0; i < tileCount; i++) {
+                    const x = view.getUint16(offset);
+                    const y = view.getUint16(offset + 2);
+                    const w = view.getUint16(offset + 4);
+                    const h = view.getUint16(offset + 6);
+                    const size = view.getUint32(offset + 8);
+                    offset += 12;
+
+                    const imageData = frame.slice(offset, offset + size);
+                    offset += size;
+                    recvBytes += size;
+                    const mime = detectMimeType(new Uint8Array(imageData, 0, Math.min(16, size)));
+                    const bitmap = await createImageBitmap(new Blob([imageData], { type: mime }));
+                    if (canvas.classList.contains('hidden')) {
+                        canvas.classList.remove('hidden');
+                        placeholder.classList.add('hidden');
+                    }
+                    ctx.drawImage(bitmap, x, y, w, h);
+                    bitmap.close();
+                }
+            } catch (err) {
+                appendLog(`Frame decode error: ${err?.message || err}`, 'error');
+            }
+
+            if (latestBinaryFrame) {
+                requestAnimationFrame(renderLatestFrame);
+                return;
+            }
+            isRenderingBinaryFrame = false;
+        }
+
+        function connectRelay(registerPayload = null) {
+            if (isConnecting) return;
+            isConnecting = true;
+            connectBtn.disabled = true;
+            connectBtn.textContent = 'Connecting...';
+            const ws = new WebSocket(socketUrl);
+            ws.binaryType = 'arraybuffer';
+            socket = ws;
+            const myAttempt = ++connectAttempt;
+
+            ws.onopen = () => {
+                if (myAttempt !== connectAttempt || socket !== ws) return;
                 statusEl.classList.add('connected');
                 statusEl.querySelector('span:last-child').textContent = 'RELAY CONNECTED';
                 appendLog("Socket tunnel established.");
+                isConnecting = false;
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Establish Uplink';
+                if (registerPayload) {
+                    ws.send(JSON.stringify(registerPayload));
+                } else if (pendingRegister) {
+                    ws.send(JSON.stringify(pendingRegister));
+                }
             };
 
-            socket.onmessage = async (event) => {
-                if (event.data instanceof Blob) {
+            ws.onmessage = async (event) => {
+                if (event.data instanceof ArrayBuffer) {
                     frameCount++;
                     const now = Date.now();
                     if (now - lastFPSUpdate >= 1000) {
                         fpsCounter.textContent = frameCount;
+                        const fpsVal = frameCount;
+                        const fpsEl = fpsCounter.parentElement;
+                        if (fpsVal >= 25) { fpsEl.style.filter = 'drop-shadow(0 0 8px rgba(0,230,118,0.3))'; fpsEl.style.background = 'linear-gradient(135deg, var(--success), var(--accent))'; }
+                        else if (fpsVal >= 12) { fpsEl.style.filter = 'drop-shadow(0 0 8px rgba(255,171,64,0.3))'; fpsEl.style.background = 'linear-gradient(135deg, var(--warning), #ff9100)'; }
+                        else { fpsEl.style.filter = 'drop-shadow(0 0 8px rgba(255,82,82,0.3))'; fpsEl.style.background = 'linear-gradient(135deg, var(--danger), #d32f2f)'; }
+                        fpsEl.style.backgroundClip = 'text'; fpsEl.style.webkitBackgroundClip = 'text'; fpsEl.style.webkitTextFillColor = 'transparent';
                         frameCount = 0;
                         lastFPSUpdate = now;
                     }
-
-                    const arrayBuffer = await event.data.arrayBuffer();
-                    const view = new DataView(arrayBuffer);
-                    let offset = 0;
-
-                    const tileCount = view.getUint16(offset);
-                    offset += 2;
-
-                    for (let i = 0; i < tileCount; i++) {
-                        const x = view.getUint16(offset);
-                        const y = view.getUint16(offset + 2);
-                        const w = view.getUint16(offset + 4);
-                        const h = view.getUint16(offset + 6);
-                        const size = view.getUint32(offset + 8);
-                        offset += 12;
-
-                        const jpegData = arrayBuffer.slice(offset, offset + size);
-                        offset += size;
-
-                        const blob = new Blob([jpegData], { type: 'image/jpeg' });
-                        const url = URL.createObjectURL(blob);
-                        const img = new Image();
-                        img.onload = () => {
-                            if (canvas.classList.contains('hidden')) {
-                                canvas.classList.remove('hidden');
-                                placeholder.classList.add('hidden');
-                            }
-                            
-                            // Inizializzazione dinamica del canvas sulle dimensioni del monitor remoto
-                            if (canvas.width !== 1920 || canvas.height !== 1080) {
-                                // Nota: DXGI di solito riporta dimensioni fisse (es. 1920x1080)
-                                // Impostiamo un target standard se non definito
-                                canvas.width = 1920; 
-                                canvas.height = 1080;
-                            }
-                            
-                            ctx.drawImage(img, x, y, w, h);
-                            URL.revokeObjectURL(url);
-                        };
-                        img.src = url;
-                    }
+                    latestBinaryFrame = event.data;
+                    scheduleFrameRender();
                     return;
                 }
 
@@ -452,44 +771,122 @@
                         canvas.width = data.width;
                         canvas.height = data.height;
                         appendLog(`Remote Resolution: ${data.width}x${data.height}`);
+                        updateStreamMeta(`MODE: ${selectedMode.toUpperCase()}  |  ${data.width}x${data.height}`);
                     }
                     loginSection.classList.add('hidden');
                     mainUI.classList.remove('hidden');
                     requestDir(currentPath);
+                } else if (data.type === 'stream_info') {
+                    if (data.width && data.height) {
+                        canvas.width = data.width;
+                        canvas.height = data.height;
+                        updateStreamMeta(`MODE: ${selectedMode.toUpperCase()}  |  ${data.width}x${data.height}`);
+                        const mode = data.mode ? ` mode=${data.mode}` : '';
+                        const dir = data.direction ? ` dir=${data.direction}` : '';
+                        const scale = typeof data.scale === 'number' ? ` scale=${data.scale}` : '';
+                        const kb = typeof data.frame_kb_ema === 'number' ? ` kb=${data.frame_kb_ema}` : '';
+                        const ms = typeof data.encode_ms_ema === 'number' ? ` enc=${data.encode_ms_ema}ms` : '';
+                        appendLog(`Viewer adapt:${mode}${dir}${scale}${kb}${ms}`);
+                    }
+                } else if (data.type === 'relay_stats') {
+                    relayBuffered = data.buffered_amount || 0;
+                    relayDropped = data.dropped_frames || 0;
+                    relayTxKbps = data.tx_kbps || 0;
+                    packetTypePps = data.packet_type_pps || {};
+                    traceEnabled = !!data.trace_enabled;
+                    traceRows = data.trace_rows || [];
+                    traceCompare = data.trace_compare || null;
+                    renderTraceRows();
+                    renderTraceTypes();
+                } else if (data.type === 'net_pong') {
+                    if (data.client_id === clientId && typeof data.ts === 'number') {
+                        rttMs = performance.now() - data.ts;
+                    }
                 } else if (data.type === 'file_list') renderFileList(data.path, data.items);
                 else if (data.type === 'clipboard_data') document.getElementById('clipboard-text').value = data.content;
                 else if (data.type === 'file_download') handleFileDownload(data);
+            };
+
+            ws.onerror = () => {
+                appendLog("WebSocket error.", 'error');
+                isConnecting = false;
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Establish Uplink';
+            };
+
+            ws.onclose = (ev) => {
+                statusEl.classList.remove('connected');
+                statusEl.querySelector('span:last-child').textContent = 'OFFLINE';
+                appendLog(`Connection closed (code=${ev.code}).`, 'error');
+                isConnecting = false;
+                connectBtn.disabled = false;
+                connectBtn.textContent = 'Establish Uplink';
+                if (socket === ws) socket = null;
             };
         }
 
         document.getElementById('connect-btn').onclick = () => {
             const id = document.getElementById('target-id').value;
             const pass = document.getElementById('agent-password').value;
-            socket.send(JSON.stringify({ type: 'register', role: 'viewer', targetId: id, password: pass }));
+            const payload = { type: 'register', role: 'viewer', targetId: id, password: pass };
+            pendingRegister = payload;
+            if (!id || !pass) {
+                appendLog("Inserisci Agent ID e password.", 'error');
+                return;
+            }
+            if (!socket || socket.readyState === WebSocket.CLOSED || socket.readyState === WebSocket.CLOSING) {
+                connectRelay(payload);
+                return;
+            }
+            if (socket.readyState === WebSocket.CONNECTING) {
+                appendLog("Connessione in corso, attendi...", 'info');
+                return;
+            }
+            safeSendJSON(payload);
         };
 
         document.getElementById('stream-btn').onclick = function() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                appendLog("Relay offline.", 'error');
+                return;
+            }
             isStreaming = !isStreaming;
             this.textContent = isStreaming ? 'Terminate Stream' : 'Initiate Stream';
             this.className = isStreaming ? 'btn btn-danger' : 'btn btn-primary';
+            selectedMode = document.getElementById('res-mode').value;
             
+            const vpc = document.querySelector('.viewport-container');
             if (isStreaming) {
                 appendLog("Stream protocol starting...");
+                if (vpc) vpc.classList.add('streaming');
                 socket.send(JSON.stringify({ 
                     type: 'start_stream', 
                     quality: parseInt(document.getElementById('quality-range').value),
-                    mode: document.getElementById('res-mode').value
+                    mode: selectedMode,
+                    adaptive_target_kb: parseInt(adaptiveTargetEl.value, 10),
+                    adaptive_enabled: !!adaptiveEnabledEl.checked,
+                    manual_scale: parseInt(manualScaleEl.value, 10) / 100.0,
+                    stream_preset: streamPresetEl.value
                 }));
             } else {
                 appendLog("Stream terminated.");
+                if (vpc) vpc.classList.remove('streaming');
                 socket.send(JSON.stringify({ type: 'stop_stream' }));
                 canvas.classList.add('hidden');
                 placeholder.classList.remove('hidden');
                 fpsCounter.textContent = "0";
+                updateStreamMeta('MODE: IDLE');
+                expectedFrameSeq = null;
+                receivedFrames = 0;
+                lostFrames = 0;
+                recvBytes = 0;
+                recvBytesLast = 0;
+                rttMs = null;
             }
         };
 
         function requestDir(path) {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return;
             currentPath = path;
             document.getElementById('current-path').textContent = path;
             socket.send(JSON.stringify({ type: 'list_dir', path }));
@@ -527,8 +924,12 @@
             });
         }
 
-        document.getElementById('get-clip-btn').onclick = () => socket.send(JSON.stringify({ type: 'get_clipboard' }));
+        document.getElementById('get-clip-btn').onclick = () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return;
+            socket.send(JSON.stringify({ type: 'get_clipboard' }));
+        };
         document.getElementById('set-clip-btn').onclick = () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return;
             socket.send(JSON.stringify({ type: 'set_clipboard', content: document.getElementById('clipboard-text').value }));
             appendLog("Clipboard buffer synchronized.");
         };
@@ -551,7 +952,9 @@
 
         // Interaction
         window.addEventListener('keydown', (e) => { 
-            if (isStreaming) socket.send(JSON.stringify({ type: 'keyboard_event', key: e.key, code: e.code })); 
+            if (isStreaming && socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ type: 'keyboard_event', key: e.key, code: e.code }));
+            }
         });
 
         canvas.addEventListener('mousedown', (e) => sendMouse('mousedown', e));
@@ -560,14 +963,78 @@
         canvas.oncontextmenu = (e) => { e.preventDefault(); sendMouse('rightclick', e); };
 
         function sendMouse(action, e) {
-            if (!isStreaming) return;
+            if (!isStreaming || !socket || socket.readyState !== WebSocket.OPEN) return;
             const rect = canvas.getBoundingClientRect();
             const x = (e.clientX - rect.left) / rect.width;
             const y = (e.clientY - rect.top) / rect.height;
             socket.send(JSON.stringify({ type: 'mouse_event', action, x, y }));
         }
 
-        initWebSocket();
+        appendLog("Premi Establish Uplink per connetterti.");
+        adaptiveTargetEl.addEventListener('input', () => {
+            adaptiveTargetLabelEl.textContent = `${adaptiveTargetEl.value} KB/frame`;
+        });
+        qualityRangeEl.addEventListener('input', () => {
+            qualityLabelEl.textContent = `${qualityRangeEl.value}%`;
+        });
+        manualScaleEl.addEventListener('input', () => {
+            manualScaleLabelEl.textContent = `${manualScaleEl.value}% (host scale)`;
+        });
+        displayModeEl.addEventListener('change', () => {
+            applyDisplayMode(displayModeEl.value);
+            appendLog(`Display mode: ${displayModeEl.value}`);
+        });
+        streamPresetEl.addEventListener('change', () => {
+            const p = streamPresetEl.value;
+            if (p === 'fluid') {
+                adaptiveEnabledEl.checked = true;
+                adaptiveTargetEl.value = '32';
+                qualityRangeEl.value = '55';
+                manualScaleEl.value = '85';
+            } else if (p === 'quality') {
+                adaptiveEnabledEl.checked = false;
+                adaptiveTargetEl.value = '56';
+                qualityRangeEl.value = '80';
+                manualScaleEl.value = '100';
+            } else {
+                adaptiveEnabledEl.checked = false;
+                adaptiveTargetEl.value = '40';
+                qualityRangeEl.value = '65';
+                manualScaleEl.value = '100';
+            }
+            adaptiveTargetLabelEl.textContent = `${adaptiveTargetEl.value} KB/frame`;
+            qualityLabelEl.textContent = `${qualityRangeEl.value}%`;
+            manualScaleLabelEl.textContent = `${manualScaleEl.value}% (host scale)`;
+        });
+        traceFlagEl.addEventListener('change', () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) return;
+            socket.send(JSON.stringify({ type: 'set_trace_mode', enabled: traceFlagEl.checked }));
+            if (!traceFlagEl.checked) {
+                traceRows = [];
+                traceCompare = null;
+                traceSelectedType = 'all';
+                renderTraceRows();
+                renderTraceTypes();
+            }
+        });
+        traceSortEl.addEventListener('change', () => {
+            traceSortMode = traceSortEl.value || 'recent';
+            renderTraceRows();
+        });
+        setInterval(() => {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'net_ping',
+                    client_id: clientId,
+                    ping_id: ++pingSeq,
+                    ts: performance.now()
+                }));
+            }
+            updateNetStats();
+        }, 1000);
+
+        applyDisplayMode('contain');
+        streamPresetEl.dispatchEvent(new Event('change'));
     </script>
 </body>
 </html>
