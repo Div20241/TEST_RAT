@@ -12,31 +12,30 @@ const PORT = process.env.PORT || 3000;
 // Serve standard static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-const agents = new Map(); // Agent ID -> { ws, password }
-const viewers = new Map(); // Viewer WS -> Agent ID they are watching
+const agents = new Map(); // Agent ID -> { ws, password, viewers: Set }
+const viewers = new Map(); // Viewer WS -> Agent ID
 
 wss.on('connection', (ws) => {
-    console.log('New WebSocket connection established.');
+    console.log('New WebSocket connection.');
     let connectionInfo = { role: null, id: null };
 
     ws.on('message', (message, isBinary) => {
         if (isBinary) {
-            // Rotta veloce per dati binari (Streaming Video)
             if (connectionInfo.role === 'agent') {
-                wss.clients.forEach((client) => {
-                    if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        if (viewers.get(client) === connectionInfo.id) {
-                            client.send(message, { binary: true });
+                const agent = agents.get(connectionInfo.id);
+                if (agent && agent.viewers) {
+                    agent.viewers.forEach(vws => {
+                        if (vws.readyState === WebSocket.OPEN) {
+                            vws.send(message, { binary: true });
                         }
-                    }
-                });
+                    });
+                }
             }
             return;
         }
 
         try {
             const data = JSON.parse(message);
-            // console.log('Received:', data); // Silenziato per performance
 
             if (data.type === 'register') {
                 if (data.role === 'agent') {
@@ -44,65 +43,48 @@ wss.on('connection', (ws) => {
                     connectionInfo.id = data.id;
                     agents.set(data.id, { 
                         ws: ws, 
-                        password: data.password,
-                        width: data.width,
-                        height: data.height
+                        password: data.password, 
+                        width: data.width, 
+                        height: data.height,
+                        viewers: new Set() 
                     });
-                    console.log(`Agent registered: ${data.id} (${data.width}x${data.height})`);
+                    console.log(`Agent registered: ${data.id}`);
                     ws.send(JSON.stringify({ type: 'registered', status: 'success' }));
                 } else if (data.role === 'viewer') {
-                    const agentEntry = agents.get(data.targetId);
-                    if (agentEntry) {
-                        if (agentEntry.password === data.password) {
-                            connectionInfo.role = 'viewer';
-                            connectionInfo.targetId = data.targetId;
-                            viewers.set(ws, data.targetId);
-                            console.log(`Viewer connected to agent: ${data.targetId}`);
-                            ws.send(JSON.stringify({ 
-                                type: 'registered', 
-                                status: 'success', 
-                                targetId: data.targetId,
-                                width: agentEntry.width,
-                                height: agentEntry.height
-                            }));
-                        } else {
-                            ws.send(JSON.stringify({ type: 'error', message: 'Invalid password' }));
-                        }
+                    const agent = agents.get(data.targetId);
+                    if (agent && agent.password === data.password) {
+                        connectionInfo.role = 'viewer';
+                        connectionInfo.targetId = data.targetId;
+                        viewers.set(ws, data.targetId);
+                        agent.viewers.add(ws);
+                        console.log(`Viewer added to agent: ${data.targetId}`);
+                        ws.send(JSON.stringify({ 
+                            type: 'registered', 
+                            status: 'success', 
+                            width: agent.width, 
+                            height: agent.height 
+                        }));
                     } else {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Agent not found or offline' }));
+                        ws.send(JSON.stringify({ type: 'error', message: 'Auth failed' }));
                     }
                 }
             } else {
-                // Forwarding logic
-                if (connectionInfo.role === 'viewer' && connectionInfo.targetId) {
-                    // Forward viewer message to agent
-                    const agentEntry = agents.get(connectionInfo.targetId);
-                    if (agentEntry && agentEntry.ws.readyState === WebSocket.OPEN) {
-                        agentEntry.ws.send(JSON.stringify({ ...data, from: 'viewer' }));
-                    }
-                } else if (connectionInfo.role === 'agent') {
-                    // Forward agent message to all viewers watching this agent
-                    wss.clients.forEach((client) => {
-                        if (client !== ws && client.readyState === WebSocket.OPEN) {
-                            if (viewers.get(client) === connectionInfo.id) {
-                                client.send(JSON.stringify({ ...data, from: 'agent' }));
-                            }
-                        }
-                    });
+                // Forwarding messaggi JSON (Mouse, ecc)
+                if (connectionInfo.role === 'viewer') {
+                    const agent = agents.get(connectionInfo.targetId);
+                    if (agent) agent.ws.send(JSON.stringify(data));
                 }
             }
-        } catch (e) {
-            console.log(`Raw message: ${message}`);
-        }
+        } catch (e) {}
     });
 
     ws.on('close', () => {
-        if (connectionInfo.role === 'agent' && connectionInfo.id) {
+        if (connectionInfo.role === 'agent') {
             agents.delete(connectionInfo.id);
-            console.log(`Agent disconnected: ${connectionInfo.id}`);
         } else if (connectionInfo.role === 'viewer') {
+            const agent = agents.get(connectionInfo.targetId);
+            if (agent) agent.viewers.delete(ws);
             viewers.delete(ws);
-            console.log(`Viewer disconnected from: ${connectionInfo.targetId}`);
         }
     });
 });
