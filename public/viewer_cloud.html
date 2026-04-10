@@ -342,6 +342,20 @@
             requestAnimationFrame(renderLatestFrame);
         }
 
+        function detectMimeType(bytes) {
+            if (bytes.length >= 3 && bytes[0] === 0xFF && bytes[1] === 0xD8 && bytes[2] === 0xFF) {
+                return 'image/jpeg';
+            }
+            if (
+                bytes.length >= 12 &&
+                bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 &&
+                bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50
+            ) {
+                return 'image/webp';
+            }
+            return 'application/octet-stream';
+        }
+
         async function renderLatestFrame() {
             const frame = latestBinaryFrame;
             latestBinaryFrame = null;
@@ -364,10 +378,11 @@
                     const size = view.getUint32(offset + 8);
                     offset += 12;
 
-                    const webpData = frame.slice(offset, offset + size);
+                    const imageData = frame.slice(offset, offset + size);
                     offset += size;
 
-                    const blob = new Blob([webpData], { type: 'image/webp' });
+                    const mime = detectMimeType(new Uint8Array(imageData, 0, Math.min(size, 16)));
+                    const blob = new Blob([imageData], { type: mime });
                     const bitmap = await createImageBitmap(blob);
                     if (canvas.classList.contains('hidden')) {
                         canvas.classList.remove('hidden');

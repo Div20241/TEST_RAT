@@ -32,16 +32,21 @@ function safeSendJSON(ws, payload) {
 wss.on('connection', (ws) => {
     console.log('New WebSocket connection.');
     let connectionInfo = { role: null, id: null };
+    try {
+        ws._socket?.setNoDelay(true);
+        ws._socket?.setKeepAlive(true, 10000);
+    } catch {}
 
     ws.on('message', (message, isBinary) => {
         if (isBinary) {
             if (connectionInfo.role === 'agent') {
                 const agent = agents.get(connectionInfo.id);
+                if (!agent || !agent.viewers || agent.viewers.size === 0) return;
                 if (agent && agent.viewers) {
                     agent.viewers.forEach(vws => {
                         if (vws.readyState === WebSocket.OPEN) {
                             // Avoid viewer-side frame backlog: skip when socket queue is already too large.
-                            if (vws.bufferedAmount > 8 * 1024 * 1024) return;
+                            if (vws.bufferedAmount > 2 * 1024 * 1024) return;
                             vws.send(message, { binary: true });
                         }
                     });
