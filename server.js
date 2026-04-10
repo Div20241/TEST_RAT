@@ -5,7 +5,11 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({
+    server,
+    perMessageDeflate: false,
+    maxPayload: 50 * 1024 * 1024
+});
 
 const PORT = process.env.PORT || 3000;
 
@@ -14,6 +18,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const agents = new Map(); // Agent ID -> { ws, password, viewers: Set }
 const viewers = new Map(); // Viewer WS -> Agent ID
+
+function safeSendJSON(ws, payload) {
+    if (ws.readyState !== WebSocket.OPEN) return false;
+    try {
+        ws.send(JSON.stringify(payload));
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 wss.on('connection', (ws) => {
     console.log('New WebSocket connection.');
@@ -26,6 +40,8 @@ wss.on('connection', (ws) => {
                 if (agent && agent.viewers) {
                     agent.viewers.forEach(vws => {
                         if (vws.readyState === WebSocket.OPEN) {
+                            // Avoid viewer-side frame backlog: skip when socket queue is already too large.
+                            if (vws.bufferedAmount > 8 * 1024 * 1024) return;
                             vws.send(message, { binary: true });
                         }
                     });
@@ -39,6 +55,10 @@ wss.on('connection', (ws) => {
 
             if (data.type === 'register') {
                 if (data.role === 'agent') {
+                    const oldAgent = agents.get(data.id);
+                    if (oldAgent && oldAgent.ws !== ws) {
+                        try { oldAgent.ws.close(); } catch {}
+                    }
                     connectionInfo.role = 'agent';
                     connectionInfo.id = data.id;
                     agents.set(data.id, { 
@@ -49,7 +69,7 @@ wss.on('connection', (ws) => {
                         viewers: new Set() 
                     });
                     console.log(`Agent registered: ${data.id}`);
-                    ws.send(JSON.stringify({ type: 'registered', status: 'success' }));
+                    safeSendJSON(ws, { type: 'registered', status: 'success' });
                 } else if (data.role === 'viewer') {
                     const agent = agents.get(data.targetId);
                     if (agent && agent.password === data.password) {
@@ -58,24 +78,41 @@ wss.on('connection', (ws) => {
                         viewers.set(ws, data.targetId);
                         agent.viewers.add(ws);
                         console.log(`Viewer added to agent: ${data.targetId}`);
-                        ws.send(JSON.stringify({ 
+                        safeSendJSON(ws, { 
                             type: 'registered', 
                             status: 'success', 
                             width: agent.width, 
                             height: agent.height 
-                        }));
+                        });
                     } else {
-                        ws.send(JSON.stringify({ type: 'error', message: 'Auth failed' }));
+                        safeSendJSON(ws, { type: 'error', message: 'Auth failed' });
                     }
                 }
             } else {
-                // Forwarding messaggi JSON (Mouse, ecc)
+                // Forward viewer -> agent (mouse/keyboard/files/clipboard)
                 if (connectionInfo.role === 'viewer') {
                     const agent = agents.get(connectionInfo.targetId);
-                    if (agent) agent.ws.send(JSON.stringify(data));
+                    if (agent && agent.ws.readyState === WebSocket.OPEN) {
+                        agent.ws.send(JSON.stringify(data));
+                    }
+                }
+                // Forward agent -> all viewers (stream_info, clipboard_data, file_list, ecc)
+                else if (connectionInfo.role === 'agent') {
+                    const agent = agents.get(connectionInfo.id);
+                    if (!agent || !agent.viewers) return;
+                    agent.viewers.forEach(vws => {
+                        if (vws.readyState === WebSocket.OPEN) {
+                            safeSendJSON(vws, data);
+                        } else {
+                            agent.viewers.delete(vws);
+                            viewers.delete(vws);
+                        }
+                    });
                 }
             }
-        } catch (e) {}
+        } catch (e) {
+            safeSendJSON(ws, { type: 'error', message: 'Invalid JSON payload' });
+        }
     });
 
     ws.on('close', () => {
