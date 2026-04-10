@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity Cloud - Pro Viewer</title>
+    <title>Antigravity Remote Cloud - Nexus OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #05070a;
-            --surface: rgba(17, 20, 28, 0.9);
+            --surface: rgba(17, 20, 28, 0.85);
             --accent: #00f2ff;
             --accent-glow: rgba(0, 242, 255, 0.3);
             --secondary: #7c4dff;
@@ -17,17 +17,18 @@
             --text-primary: #ffffff;
             --text-secondary: #94a3b8;
             --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: radial-gradient(circle at 100% 0%, #1a1a2e 0%, #05070a 100%);
+            background: radial-gradient(circle at 0% 0%, #101827 0%, #05070a 100%);
             color: var(--text-primary);
             margin: 0;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
@@ -36,17 +37,18 @@
         .glass-container {
             width: 95%;
             max-width: 1200px;
+            margin: 40px auto;
             background: var(--surface);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(16px);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
-            animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            padding: 2.2rem;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+            animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -59,8 +61,8 @@
             padding-bottom: 1.5rem;
         }
 
-        .brand {
-            font-size: 1.4rem;
+        .logo {
+            font-size: 1.5rem;
             font-weight: 600;
             background: linear-gradient(90deg, #fff, var(--accent));
             -webkit-background-clip: text;
@@ -76,84 +78,134 @@
             gap: 8px;
             padding: 8px 16px;
             border-radius: 30px;
-            background: rgba(0,0,0,0.4);
-            font-size: 0.8rem;
+            background: rgba(0,0,0,0.3);
+            font-size: 0.85rem;
+            font-weight: 500;
             border: 1px solid var(--border);
-            transition: 0.3s;
         }
 
-        .status-badge.connected { border-color: var(--success); color: var(--success); box-shadow: 0 0 15px rgba(0, 230, 118, 0.2); }
+        .status-dot { height: 10px; width: 10px; background-color: #444; border-radius: 50%; transition: 0.3s; }
+        .connected .status-dot { background-color: var(--success); box-shadow: 0 0 12px var(--success); }
 
-        /* Login */
-        .login-box {
+        /* Auth Section */
+        .auth-grid {
+            max-width: 500px;
+            margin: 4rem auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-width: 400px;
-            margin: 4rem auto;
-            text-align: center;
+            gap: 14px;
         }
 
-        input, select, textarea {
+        input {
             background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
             color: white;
             padding: 14px 18px;
             border-radius: 12px;
             font-size: 0.95rem;
-            outline: none;
             transition: 0.3s;
         }
 
-        input:focus { border-color: var(--accent); background: rgba(0,0,0,0.6); }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
         .btn {
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            color: #000;
             cursor: pointer;
             padding: 14px 24px;
             border-radius: 12px;
-            font-weight: 700;
+            font-weight: 600;
             border: none;
             transition: all 0.3s;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             font-size: 0.85rem;
         }
 
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px var(--accent-glow); filter: brightness(1.1); }
-
-        /* Dashboard */
-        .workspace { display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
-        
-        .panel {
-            background: rgba(0,0,0,0.2);
-            border-radius: 18px;
-            padding: 20px;
-            border: 1px solid var(--border);
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
 
-        .stat-card { margin-bottom: 20px; }
-        .stat-label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-family: 'JetBrains Mono'; font-size: 2rem; color: var(--accent); }
-
-        canvas {
-            width: 100%;
-            background: #000;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--accent-glow);
         }
 
-        #log {
-            margin-top: 20px;
-            background: #010409;
+        .btn-danger { background: var(--danger); color: white; }
+
+        /* Main UI Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.25);
+            border-radius: 20px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
             color: var(--text-secondary);
-            padding: 15px;
-            border-radius: 12px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: var(--accent);
+            font-family: 'JetBrains Mono';
+        }
+
+        /* Viewport */
+        .viewport-container {
+            position: relative;
+            background: #000;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas { max-width: 100%; max-height: 100%; display: block; }
+
+        .viewport-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 14px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
             font-family: 'JetBrains Mono';
             font-size: 0.75rem;
-            height: 100px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .console {
+            margin-top: 24px;
+            background: #000;
+            border-radius: 14px;
+            padding: 18px;
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            height: 120px;
             overflow-y: auto;
             border: 1px solid var(--border);
         }
@@ -165,41 +217,60 @@
 
     <div class="glass-container">
         <div class="header">
-            <div class="brand">
+            <div class="logo">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                NEXUS CLOUD
+                ANTIGRAVITY CLOUD
             </div>
-            <div id="status" class="status-badge">● OFFLINE</div>
+            <div id="status" class="status-badge">
+                <span class="status-dot"></span> <span>OFFLINE</span>
+            </div>
         </div>
 
-        <div id="login-section" class="login-box">
-            <h2 style="font-weight: 300; margin-bottom: 2rem;">Cloud Terminal Auth</h2>
-            <input type="text" id="relay-url" placeholder="wss://relay-link...">
-            <input type="text" id="target-id" placeholder="Agent ID">
-            <input type="password" id="agent-password" placeholder="Keyphrase">
-            <button id="connect-btn" class="btn">Establish Uplink</button>
+        <div id="login-section">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-weight: 300;">Authentication Required</h1>
+                <p style="color: var(--text-secondary);">Connect to a remote Nexus Relay node</p>
+            </div>
+            <div class="auth-grid">
+                <input type="text" id="relay-url" placeholder="wss://relay-address.com">
+                <input type="text" id="target-id" placeholder="Agent ID">
+                <input type="password" id="agent-password" placeholder="Keyphrase">
+                <button id="connect-btn" class="btn btn-primary">Establish Uplink</button>
+            </div>
         </div>
 
         <div id="main-ui" class="hidden">
-            <div class="workspace">
+            <div class="dashboard-grid">
                 <div class="sidebar">
-                    <div class="panel stat-card">
-                        <div class="stat-label">Frame Rate</div>
-                        <div class="stat-value"><span id="fps">0</span> <small style="font-size: 1rem;">FPS</small></div>
+                    <div class="card">
+                        <div class="card-title">🚀 Performance</div>
+                        <div class="stat-value"><span id="fps">0</span> <small style="font-size: 0.9rem; opacity: 0.5;">FPS</small></div>
+                        <div style="margin-top: 20px;">
+                            <label style="font-size: 0.65rem; color: var(--text-secondary);">JPEG UPLINK QUALITY</label>
+                            <input type="range" id="quality" min="10" max="95" value="40" style="width: 100%; margin-top: 8px;">
+                            <button id="stream-btn" class="btn btn-primary" style="width: 100%; margin-top: 20px;">Start Stream</button>
+                        </div>
                     </div>
 
-                    <div class="panel">
-                        <div class="stat-label">Streaming Config</div>
-                        <label style="font-size: 0.65rem; display: block; margin: 10px 0 5px;">QUALITY</label>
-                        <input type="range" id="quality" min="10" max="95" value="40" style="width: 100%;">
-                        <button id="stream-btn" class="btn" style="width: 100%; margin-top: 20px; font-size: 0.7rem;">Init Stream</button>
+                    <div class="card">
+                        <div class="card-title">📁 Cloud Explorer</div>
+                        <div id="current-path" style="font-size: 0.7rem; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">C:\</div>
                     </div>
-
-                    <div id="log">>> Nexus protocol standby...</div>
                 </div>
 
-                <div class="viewport">
-                    <canvas id="screen"></canvas>
+                <div class="main">
+                    <div class="viewport-container">
+                        <div id="placeholder" style="color: #444; text-align: center;">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="opacity: 0.2; margin-bottom: 10px;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                            <p style="opacity: 0.3;">Awaiting Signal...</p>
+                        </div>
+                        <canvas id="screen" class="hidden"></canvas>
+                        <div class="viewport-overlay">SECURE CLOUD TETHER</div>
+                    </div>
+                    <div class="console" id="log">
+                        [SYS] Cloud infrastructure ready.<br>
+                        [SYS] Awaiting manual uplink establishment...<br>
+                    </div>
                 </div>
             </div>
         </div>
@@ -217,8 +288,9 @@
         const statusEl = document.getElementById('status');
         const fpsEl = document.getElementById('fps');
 
-        function appendLog(msg) {
-            logEl.innerHTML += `<br>> ${msg}`;
+        function appendLog(msg, type='info') {
+            const color = type === 'error' ? 'var(--danger)' : 'var(--text-secondary)';
+            logEl.innerHTML += `[${new Date().toLocaleTimeString()}] <span style="color:${color}">${msg}</span><br>`;
             logEl.scrollTop = logEl.scrollHeight;
         }
 
@@ -227,14 +299,14 @@
             const id = document.getElementById('target-id').value;
             const pass = document.getElementById('agent-password').value;
 
-            if (!url) return alert("Missing Relay Link!");
+            if(!url) return alert("Enter Relay URL!");
 
             socket = new WebSocket(url);
             socket.binaryType = 'arraybuffer';
 
             socket.onopen = () => {
-                statusEl.innerText = "● CLOUD CONNECTED";
                 statusEl.classList.add('connected');
+                statusEl.querySelector('span:last-child').innerText = 'CLOUD CONNECTED';
                 socket.send(JSON.stringify({ type: 'register', role: 'viewer', targetId: id, password: pass }));
             };
 
@@ -248,7 +320,6 @@
                         lastFPS = now;
                     }
 
-                    // --- BINARY PROTOCOL DECODER ---
                     const view = new DataView(event.data);
                     let offset = 0;
                     const tileCount = view.getUint16(offset);
@@ -269,6 +340,10 @@
                         const urlImg = URL.createObjectURL(blob);
                         const img = new Image();
                         img.onload = () => {
+                            if (canvas.classList.contains('hidden')) {
+                                canvas.classList.remove('hidden');
+                                document.getElementById('placeholder').classList.add('hidden');
+                            }
                             ctx.drawImage(img, x, y, w, h);
                             URL.revokeObjectURL(urlImg);
                         };
@@ -279,7 +354,7 @@
 
                 const data = JSON.parse(event.data);
                 if (data.type === 'registered') {
-                    appendLog("Uplink Secure. Authorization Granted.");
+                    appendLog("Access Authorized. Tethering established.");
                     if (data.width) {
                         canvas.width = data.width;
                         canvas.height = data.height;
@@ -287,20 +362,15 @@
                     document.getElementById('login-section').classList.add('hidden');
                     document.getElementById('main-ui').classList.remove('hidden');
                 } else if (data.type === 'error') {
-                    appendLog("AUTH ERROR: " + data.message);
+                    appendLog(data.message, 'error');
                 }
-            };
-
-            socket.onclose = () => {
-                statusEl.innerText = "● DISCONNECTED";
-                statusEl.classList.remove('connected');
             };
         };
 
         document.getElementById('stream-btn').onclick = function() {
             isStreaming = !isStreaming;
-            this.innerText = isStreaming ? 'Kill Stream' : 'Init Stream';
-            this.style.background = isStreaming ? 'var(--danger)' : '';
+            this.innerText = isStreaming ? 'Terminate' : 'Start Stream';
+            this.className = isStreaming ? 'btn btn-danger' : 'btn btn-primary';
             
             socket.send(JSON.stringify({ 
                 type: isStreaming ? 'start_stream' : 'stop_stream',
@@ -308,7 +378,7 @@
             }));
         };
 
-        // Interaction (Mouse)
+        // Interaction
         canvas.addEventListener('mousedown', (e) => sendMouse('mousedown', e));
         canvas.addEventListener('mouseup', (e) => sendMouse('mouseup', e));
         canvas.addEventListener('mousemove', (e) => { if (e.buttons === 1) sendMouse('mousemove', e); });
@@ -320,6 +390,10 @@
             const y = (e.clientY - rect.top) / rect.height;
             socket.send(JSON.stringify({ type: 'mouse_event', action, x, y }));
         }
+
+        window.addEventListener('keydown', (e) => { 
+            if (isStreaming) socket.send(JSON.stringify({ type: 'keyboard_event', key: e.key })); 
+        });
     </script>
 </body>
 </html>

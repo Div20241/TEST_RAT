@@ -42,8 +42,13 @@ wss.on('connection', (ws) => {
                 if (data.role === 'agent') {
                     connectionInfo.role = 'agent';
                     connectionInfo.id = data.id;
-                    agents.set(data.id, { ws: ws, password: data.password });
-                    console.log(`Agent registered: ${data.id} (Password Protected)`);
+                    agents.set(data.id, { 
+                        ws: ws, 
+                        password: data.password,
+                        width: data.width,
+                        height: data.height
+                    });
+                    console.log(`Agent registered: ${data.id} (${data.width}x${data.height})`);
                     ws.send(JSON.stringify({ type: 'registered', status: 'success' }));
                 } else if (data.role === 'viewer') {
                     const agentEntry = agents.get(data.targetId);
@@ -52,8 +57,14 @@ wss.on('connection', (ws) => {
                             connectionInfo.role = 'viewer';
                             connectionInfo.targetId = data.targetId;
                             viewers.set(ws, data.targetId);
-                            console.log(`Viewer authorized and connected to agent: ${data.targetId}`);
-                            ws.send(JSON.stringify({ type: 'registered', status: 'success', targetId: data.targetId }));
+                            console.log(`Viewer connected to agent: ${data.targetId}`);
+                            ws.send(JSON.stringify({ 
+                                type: 'registered', 
+                                status: 'success', 
+                                targetId: data.targetId,
+                                width: agentEntry.width,
+                                height: agentEntry.height
+                            }));
                         } else {
                             ws.send(JSON.stringify({ type: 'error', message: 'Invalid password' }));
                         }
