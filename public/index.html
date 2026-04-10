@@ -3,198 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity Remote Viewer - Ultra Performance</title>
+    <title>Antigravity Remote Viewer - Nexus OS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0d1117;
-            --card-bg: #161b22;
-            --accent: #58a6ff;
-            --text: #c9d1d9;
-            --danger: #f85149;
-            --success: #3fb950;
+            --bg: #05070a;
+            --surface: rgba(17, 20, 28, 0.85);
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.3);
+            --secondary: #7c4dff;
+            --success: #00e676;
+            --danger: #ff5252;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
+        * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at 0% 0%, #101827 0%, #05070a 100%);
+            color: var(--text-primary);
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
         }
 
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            text-align: center;
+        /* Glassmorphism Container */
+        .glass-container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 80px rgba(0,0,0,0.8);
+            animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            background: #21262d;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(0,0,0,0.3);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
         }
 
         .status-dot {
             height: 10px; width: 10px;
-            background-color: #8b949e;
+            background-color: #444;
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 5px;
+            transition: 0.3s;
         }
 
-        .connected .status-dot { background-color: var(--success); box-shadow: 0 0 10px var(--success); }
+        .connected .status-dot { 
+            background-color: var(--success); 
+            box-shadow: 0 0 12px var(--success); 
+        }
 
-        .hidden { display: none !important; }
+        /* Input Styles */
+        .input-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 4rem 0;
+        }
 
-        input, select, textarea, button {
-            font-family: inherit;
-            background: #0d1117;
-            border: 1px solid #30363d;
+        input, select, textarea {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
             color: white;
-            padding: 8px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            transition: 0.2s;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
         }
 
-        .btn-primary { background: var(--accent); border: none; font-weight: bold; cursor: pointer; width: 100%; padding: 12px; }
-        .btn-primary:hover { opacity: 0.9; }
-        
-        #log {
-            background: #010409;
-            color: #7d8590;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: left;
-            font-family: monospace;
-            font-size: 0.75rem;
-            max-height: 80px;
-            overflow-y: auto;
-            margin-top: 15px;
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .btn {
+            cursor: pointer;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            color: #000;
+            font-weight: 700;
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px var(--accent-glow);
+            filter: brightness(1.2);
+        }
+
+        .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 15px rgba(255, 82, 82, 0.3); }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255, 82, 82, 0.5); }
+
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: rgba(0,0,0,0.25);
+            border-radius: 18px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--success);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Stream Viewport */
+        .viewport-container {
+            position: relative;
+            background: #000;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.5);
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         canvas {
-            width: 100%;
-            background: #000;
-            border-radius: 8px;
-            border: 1px solid #30363d;
-            margin-top: 15px;
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
         }
 
-        .control-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+        .viewport-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 14px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .panel {
-            background: rgba(0,0,0,0.2);
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #30363d;
-            text-align: left;
-        }
-
-        .panel label { display: block; font-size: 0.75rem; color: #8b949e; margin-bottom: 5px; }
-
-        #explorer-container {
-            margin-top: 15px;
-            background: #0d1117;
-            border-radius: 8px;
-            max-height: 300px;
+        /* Remote Explorer */
+        .explorer {
+            max-height: 250px;
             overflow-y: auto;
-            padding: 10px;
+            margin-top: 10px;
+            padding-right: 5px;
         }
+
+        .explorer::-webkit-scrollbar { width: 5px; }
+        .explorer::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
         .file-item {
             display: flex;
             align-items: center;
-            padding: 6px;
-            border-bottom: 1px solid #21262d;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.8rem;
+            transition: 0.2s;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
         }
 
-        .file-item:hover { background: rgba(88, 166, 255, 0.1); }
+        .file-item:hover {
+            background: rgba(124, 77, 255, 0.1);
+            color: var(--accent);
+        }
+
+        /* Console Log Phrases */
+        .console {
+            margin-top: 20px;
+            background: #000;
+            border-radius: 12px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            height: 100px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .hidden { display: none !important; }
+
+        /* Range Input Styling */
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--accent);
+            height: 6px;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2 style="margin:0; color:var(--accent)">Antigravity RAT - Pro Viewer</h2>
-        <div id="connection-status" class="status-badge">
-            <span class="status-dot"></span> Disconnected
+    <div class="glass-container">
+        <div class="header">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                ANTIGRAVITY NEXUS
+            </div>
+            <div id="connection-status" class="status-badge">
+                <span class="status-dot"></span> <span>OFFLINE</span>
+            </div>
         </div>
 
-        <!-- Login -->
+        <!-- Login / Entry Section -->
         <div id="login-section">
-            <input type="text" id="target-id" placeholder="Agent ID" style="width:200px">
-            <input type="password" id="agent-password" placeholder="Password" style="width:200px">
-            <button id="connect-btn" class="btn-primary" style="width:auto">Connect</button>
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-weight: 300; margin-bottom: 0.5rem;">Access Remote Terminal</h1>
+                <p style="color: var(--text-secondary);">Secure encrypted connection required</p>
+            </div>
+            <div class="input-group">
+                <input type="text" id="target-id" placeholder="Agent ID" value="PC_REMOTO_01">
+                <input type="password" id="agent-password" placeholder="Key Phrase">
+                <button id="connect-btn" class="btn btn-primary">Establish Uplink</button>
+            </div>
         </div>
 
+        <!-- Main Workspace -->
         <div id="main-ui" class="hidden">
-            <div class="control-grid">
-                <!-- Video Controls -->
-                <div class="panel">
-                    <label>Performance Dashboard</label>
-                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--success);">
-                        FPS: <span id="fps-counter">0</span>
+            <div class="dashboard-grid">
+                <!-- Sidebar Controls -->
+                <div class="sidebar">
+                    <div class="card">
+                        <div class="card-title">🚀 Performance</div>
+                        <div class="stat-value"><span id="fps-counter">0</span> <span style="font-size: 0.8rem; color: var(--text-secondary)">FPS</span></div>
+                        
+                        <div style="margin-top: 20px;">
+                            <label style="display:block; font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 8px;">UPLINK QUALITY</label>
+                            <select id="res-mode" style="width:100%; margin-bottom: 12px;">
+                                <option value="performance">TURBO (480p / High-Speed)</option>
+                                <option value="quality">HD (720p / Native)</option>
+                            </select>
+                            <input type="range" id="quality-range" min="10" max="95" value="75">
+                        </div>
+                        
+                        <button id="stream-btn" class="btn btn-primary" style="width:100%; margin-top: 20px;">Initiate Stream</button>
                     </div>
-                    <label style="margin-top:10px">Streaming Mode</label>
-                    <select id="res-mode" style="width:100%">
-                        <option value="performance">Speed Mode (480p - 240fps target)</option>
-                        <option value="quality">High Quality (720p)</option>
-                    </select>
-                    <label>JPEG Quality (10-95)</label>
-                    <input type="range" id="quality-range" min="10" max="95" value="40" style="width:100%">
-                    <button id="stream-btn" class="btn-primary">Start Live Stream</button>
+
+                    <div class="card">
+                        <div class="card-title">📁 Remote Nexus</div>
+                        <div id="current-path" style="font-size: 0.7rem; color: var(--accent); margin-bottom: 10px; font-family: monospace;">C:\</div>
+                        <div class="explorer" id="file-list">
+                            <!-- Files populated here -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📋 Data Buffer</div>
+                        <textarea id="clipboard-text" style="width:100%; height:60px; margin-bottom:12px; font-size: 0.8rem;" placeholder="Remote clipboard..."></textarea>
+                        <div style="display:flex; gap:8px">
+                            <button id="get-clip-btn" class="btn" style="flex:1; background: rgba(255,255,255,0.05);">Pull</button>
+                            <button id="set-clip-btn" class="btn" style="flex:1; background: rgba(255,255,255,0.05);">Push</button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Clipboard & Files -->
-                <div class="panel">
-                    <label>Remote Clipboard</label>
-                    <textarea id="clipboard-text" style="width:100%; height:40px; margin-bottom:5px"></textarea>
-                    <div style="display:flex; gap:5px">
-                        <button id="get-clip-btn" style="flex:1; font-size:0.7rem">Fetch</button>
-                        <button id="set-clip-btn" style="flex:1; font-size:0.7rem">Set</button>
+                <!-- Viewport Area -->
+                <div class="main-view">
+                    <div class="viewport-container">
+                        <div id="stream-placeholder" style="color: #333; text-align: center;">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 15px; opacity: 0.3;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                            <p style="opacity: 0.3; font-weight: 300;">Awaiting Uplink Signal...</p>
+                        </div>
+                        <canvas id="remote-screen" class="hidden"></canvas>
+                        <div class="viewport-overlay">LIVE // ENCRYPTED</div>
                     </div>
-                    <label style="margin-top:10px">Upload File</label>
-                    <input type="file" id="file-input" style="font-size:0.7rem; width:100%">
-                    <button id="upload-btn" style="width:100%; font-size:0.7rem">Upload to Agent</button>
-                </div>
 
-                <!-- Downloads -->
-                <div class="panel">
-                    <label>Direct Download</label>
-                    <input type="text" id="download-path" placeholder="C:\path\to\file.txt" style="width:100%">
-                    <button id="download-btn" class="btn-primary" style="padding:5px">Download File</button>
-                    
-                    <div id="explorer-container">
-                        <label>Remote Explorer: <span id="current-path" style="color:var(--accent)">C:\</span></label>
-                        <div id="file-list"></div>
+                    <div class="console" id="log">
+                        [SYS] Authentication verified.<br>
+                        [SYS] Nexus Protocol v2.4 initialized.<br>
                     </div>
                 </div>
             </div>
-
-            <!-- Video Surface -->
-            <canvas id="remote-screen"></canvas>
-        </div>
-
-        <div id="log">
-            > Welcome to Antigravity RAT Console...<br>
         </div>
     </div>
 
@@ -211,11 +371,13 @@
         const mainUI = document.getElementById('main-ui');
         const loginSection = document.getElementById('login-section');
         const canvas = document.getElementById('remote-screen');
+        const placeholder = document.getElementById('stream-placeholder');
         const ctx = canvas.getContext('2d');
         const fpsCounter = document.getElementById('fps-counter');
 
-        function appendLog(msg) {
-            logEl.innerHTML += `> ${msg}<br>`;
+        function appendLog(msg, type='info') {
+            const color = type === 'error' ? 'var(--danger)' : 'var(--text-secondary)';
+            logEl.innerHTML += `[${new Date().toLocaleTimeString()}] <span style="color:${color}">${msg}</span><br>`;
             logEl.scrollTop = logEl.scrollHeight;
         }
 
@@ -225,11 +387,11 @@
             
             socket.onopen = () => {
                 statusEl.classList.add('connected');
-                statusEl.innerHTML = '<span class="status-dot"></span> Connected to Relay';
-                appendLog("Connected to Relay Server.");
+                statusEl.querySelector('span:last-child').textContent = 'RELAY CONNECTED';
+                appendLog("Socket tunnel established.");
             };
 
-            socket.onmessage = (event) => {
+            socket.onmessage = async (event) => {
                 if (event.data instanceof Blob) {
                     frameCount++;
                     const now = Date.now();
@@ -239,31 +401,64 @@
                         lastFPSUpdate = now;
                     }
 
-                    const url = URL.createObjectURL(event.data);
-                    const img = new Image();
-                    img.onload = () => {
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
-                        URL.revokeObjectURL(url);
-                    };
-                    img.src = url;
+                    const arrayBuffer = await event.data.arrayBuffer();
+                    const view = new DataView(arrayBuffer);
+                    let offset = 0;
+
+                    const tileCount = view.getUint16(offset);
+                    offset += 2;
+
+                    for (let i = 0; i < tileCount; i++) {
+                        const x = view.getUint16(offset);
+                        const y = view.getUint16(offset + 2);
+                        const w = view.getUint16(offset + 4);
+                        const h = view.getUint16(offset + 6);
+                        const size = view.getUint32(offset + 8);
+                        offset += 12;
+
+                        const jpegData = arrayBuffer.slice(offset, offset + size);
+                        offset += size;
+
+                        const blob = new Blob([jpegData], { type: 'image/jpeg' });
+                        const url = URL.createObjectURL(blob);
+                        const img = new Image();
+                        img.onload = () => {
+                            if (canvas.classList.contains('hidden')) {
+                                canvas.classList.remove('hidden');
+                                placeholder.classList.add('hidden');
+                            }
+                            
+                            // Inizializzazione dinamica del canvas sulle dimensioni del monitor remoto
+                            if (canvas.width !== 1920 || canvas.height !== 1080) {
+                                // Nota: DXGI di solito riporta dimensioni fisse (es. 1920x1080)
+                                // Impostiamo un target standard se non definito
+                                canvas.width = 1920; 
+                                canvas.height = 1080;
+                            }
+                            
+                            ctx.drawImage(img, x, y, w, h);
+                            URL.revokeObjectURL(url);
+                        };
+                        img.src = url;
+                    }
                     return;
                 }
 
                 const data = JSON.parse(event.data);
-                if (data.type === 'error') appendLog(`<span style="color:var(--danger)">${data.message}</span>`);
+                if (data.type === 'error') appendLog(data.message, 'error');
                 else if (data.type === 'registered') {
-                    appendLog("Authorized Access Granted.");
+                    appendLog("Access Granted. Nexus active.");
+                    if (data.width && data.height) {
+                        canvas.width = data.width;
+                        canvas.height = data.height;
+                        appendLog(`Remote Resolution: ${data.width}x${data.height}`);
+                    }
                     loginSection.classList.add('hidden');
                     mainUI.classList.remove('hidden');
-                    // Stop preventivo per sicurezza
-                    socket.send(JSON.stringify({ type: 'stop_stream' }));
                     requestDir(currentPath);
                 } else if (data.type === 'file_list') renderFileList(data.path, data.items);
                 else if (data.type === 'clipboard_data') document.getElementById('clipboard-text').value = data.content;
                 else if (data.type === 'file_download') handleFileDownload(data);
-                else if (data.type === 'chat') appendLog(`Agent: ${data.content}`);
             };
         }
 
@@ -275,24 +470,25 @@
 
         document.getElementById('stream-btn').onclick = function() {
             isStreaming = !isStreaming;
-            this.textContent = isStreaming ? 'Stop Stream' : 'Start Live Stream';
-            this.style.background = isStreaming ? 'var(--danger)' : 'var(--accent)';
+            this.textContent = isStreaming ? 'Terminate Stream' : 'Initiate Stream';
+            this.className = isStreaming ? 'btn btn-danger' : 'btn btn-primary';
             
             if (isStreaming) {
+                appendLog("Stream protocol starting...");
                 socket.send(JSON.stringify({ 
                     type: 'start_stream', 
                     quality: parseInt(document.getElementById('quality-range').value),
                     mode: document.getElementById('res-mode').value
                 }));
             } else {
+                appendLog("Stream terminated.");
                 socket.send(JSON.stringify({ type: 'stop_stream' }));
-                // Pulisci il canvas e azzera FPS
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                canvas.classList.add('hidden');
+                placeholder.classList.remove('hidden');
                 fpsCounter.textContent = "0";
             }
         };
 
-        // Inputs & Explorer
         function requestDir(path) {
             currentPath = path;
             document.getElementById('current-path').textContent = path;
@@ -305,7 +501,7 @@
             if (path !== 'C:\\' && path !== 'C:/') {
                 const back = document.createElement('div');
                 back.className = 'file-item';
-                back.innerHTML = '📁 .. (Back)';
+                back.innerHTML = '<span>📁</span> .. (Parent)';
                 back.onclick = () => {
                     const parts = path.split(/[\\\/]/).filter(p => p !== '');
                     parts.pop();
@@ -318,45 +514,28 @@
             items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'file-item';
-                div.innerHTML = `${item.is_dir ? '📁' : '📄'} ${item.name}`;
+                div.innerHTML = `<span>${item.is_dir ? '📁' : '📄'}</span> ${item.name}`;
                 div.onclick = () => {
                     const fullPath = path.endsWith('\\') ? path + item.name : path + '\\' + item.name;
                     if (item.is_dir) requestDir(fullPath);
-                    else document.getElementById('download-path').value = fullPath;
+                    else {
+                        appendLog(`Target selected: ${item.name}`);
+                        socket.send(JSON.stringify({ type: 'request_download', path: fullPath }));
+                    }
                 };
                 list.appendChild(div);
             });
         }
 
-        // Clipboard
         document.getElementById('get-clip-btn').onclick = () => socket.send(JSON.stringify({ type: 'get_clipboard' }));
         document.getElementById('set-clip-btn').onclick = () => {
             socket.send(JSON.stringify({ type: 'set_clipboard', content: document.getElementById('clipboard-text').value }));
-        };
-
-        // Files
-        document.getElementById('upload-btn').onclick = () => {
-            const file = document.getElementById('file-input').files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                socket.send(JSON.stringify({ type: 'file_transfer', filename: file.name, data: reader.result.split(',')[1] }));
-            };
-            reader.readAsDataURL(file);
-        };
-        document.getElementById('download-btn').onclick = () => {
-            socket.send(JSON.stringify({ type: 'request_download', path: document.getElementById('download-path').value }));
+            appendLog("Clipboard buffer synchronized.");
         };
 
         function handleFileDownload(data) {
-            const blob = b64toBlob(data.data);
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = data.filename; a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function b64toBlob(b64Data) {
-            const byteCharacters = atob(b64Data);
+            appendLog(`Receiving file: ${data.filename}`);
+            const byteCharacters = atob(data.data);
             const byteArrays = [];
             for (let offset = 0; offset < byteCharacters.length; offset += 512) {
                 const slice = byteCharacters.slice(offset, offset + 512);
@@ -364,11 +543,17 @@
                 for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
                 byteArrays.push(new Uint8Array(byteNumbers));
             }
-            return new Blob(byteArrays);
+            const blob = new Blob(byteArrays);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = data.filename; a.click();
+            URL.revokeObjectURL(url);
         }
 
         // Interaction
-        window.addEventListener('keydown', (e) => { if (isStreaming) socket.send(JSON.stringify({ type: 'keyboard_event', key: e.key, code: e.code })); });
+        window.addEventListener('keydown', (e) => { 
+            if (isStreaming) socket.send(JSON.stringify({ type: 'keyboard_event', key: e.key, code: e.code })); 
+        });
+
         canvas.addEventListener('mousedown', (e) => sendMouse('mousedown', e));
         canvas.addEventListener('mouseup', (e) => sendMouse('mouseup', e));
         canvas.addEventListener('mousemove', (e) => { if (e.buttons === 1) sendMouse('mousemove', e); });
