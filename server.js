@@ -200,6 +200,23 @@ wss.on('connection', (ws) => {
                             data.manual_scale = Math.max(0.26, Math.min(1.0, Number(data.manual_scale || 1.0)));
                             data.adaptive_enabled = !!data.adaptive_enabled;
                         }
+                        if (data.type === 'terminal_exec') {
+                            data.timeout = Math.max(3, Math.min(180, Number(data.timeout || 60)));
+                            if (typeof data.command === 'string' && data.command.length > 8000) {
+                                data.command = data.command.slice(0, 8000);
+                            }
+                            if (data.cwd != null && typeof data.cwd === 'string' && data.cwd.length > 4096) {
+                                data.cwd = data.cwd.slice(0, 4096);
+                            }
+                        }
+                        if (data.type === 'terminal_input' && typeof data.data === 'string' && data.data.length > 16384) {
+                            data.data = data.data.slice(0, 16384);
+                        }
+                        if (data.type === 'terminal_open') {
+                            if (data.cwd != null && typeof data.cwd === 'string' && data.cwd.length > 4096) {
+                                data.cwd = data.cwd.slice(0, 4096);
+                            }
+                        }
                         agent.ws.send(JSON.stringify(data));
                         const vs = viewerStats.get(ws);
                         if (vs) {

@@ -322,27 +322,27 @@
                         <div class="card-title">🎬 Stream Controls</div>
                         <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-bottom:6px;">ENGINE PRESET</label>
                         <select id="stream-preset" style="width:100%; margin-bottom:12px;">
-                            <option value="fluid" selected>FLUID FIRST (recommended)</option>
+                            <option value="fluid">FLUID FIRST (recommended)</option>
                             <option value="balanced">BALANCED</option>
-                            <option value="quality">QUALITY FIRST</option>
+                            <option value="quality" selected>QUALITY FIRST</option>
                         </select>
                         <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-bottom:6px;">STREAM PROFILE (manual)</label>
                         <select id="res-mode" style="width:100%; margin-bottom:14px;">
-                            <option value="performance" selected>PERFORMANCE (High FPS)</option>
+                            <option value="performance">PERFORMANCE (High FPS)</option>
                             <option value="ultra">ULTRA (Max FPS)</option>
                             <option value="quality">QUALITY (Best detail)</option>
-                            <option value="auto_native">AUTO NATIVE (Host 100%)</option>
+                            <option value="auto_native" selected>AUTO NATIVE (Host 100%)</option>
                         </select>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                             <div>
                                 <label style="font-size:0.65rem; color:var(--text-secondary);">TARGET KB/frame</label>
-                                <input type="range" id="adaptive-target-kb" min="16" max="80" value="32">
-                                <div id="adaptive-target-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">32 KB/frame</div>
+                                <input type="range" id="adaptive-target-kb" min="16" max="80" value="56">
+                                <div id="adaptive-target-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">56 KB/frame</div>
                             </div>
                             <div>
                                 <label style="font-size:0.65rem; color:var(--text-secondary);">JPEG QUALITY</label>
-                                <input type="range" id="quality-range" min="10" max="95" value="65">
-                                <div id="quality-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">65%</div>
+                                <input type="range" id="quality-range" min="10" max="95" value="80">
+                                <div id="quality-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">80%</div>
                             </div>
                         </div>
                         <div style="margin-top:10px;">
@@ -427,6 +427,29 @@
                             <button id="set-clip-btn" class="btn" style="flex:1; background:rgba(255,255,255,0.05);">Push</button>
                         </div>
                     </div>
+
+                    <div class="card">
+                        <div class="card-title">🖥 Remote Shell (session)</div>
+                        <div style="font-size:0.65rem; color:var(--text-secondary); margin-bottom:8px;">
+                            Stile PuTTY: sessione <code>cmd</code> o <code>PowerShell</code> persistente. Invio = nuova riga al processo. <kbd>Ctrl+C</kbd> invia break.
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+                            <span id="terminal-status" style="font-size:0.68rem; font-family:monospace; color:var(--warning);">disconnected</span>
+                            <select id="terminal-shell" style="font-size:0.7rem; padding:4px 8px; border-radius:6px; border:1px solid var(--border); background:rgba(0,0,0,0.25); color:inherit;">
+                                <option value="cmd">cmd.exe</option>
+                                <option value="powershell">PowerShell</option>
+                            </select>
+                        </div>
+                        <label style="display:block; font-size:0.65rem; color:var(--text-secondary); margin-bottom:4px;">CWD (solo all’apertura)</label>
+                        <input type="text" id="terminal-cwd" style="width:100%; margin-bottom:8px; font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:6px 8px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.25); color:inherit;" placeholder="C:\ (opzionale)">
+                        <div style="display:flex; gap:8px; margin-bottom:8px;">
+                            <button type="button" id="terminal-connect" class="btn btn-primary" style="flex:1;">Connect</button>
+                            <button type="button" id="terminal-disconnect" class="btn" style="flex:1; background:rgba(255,82,82,0.2);">Disconnect</button>
+                            <button type="button" id="terminal-clear" class="btn" style="flex:0.5; background:rgba(255,255,255,0.06);">Clear</button>
+                        </div>
+                        <pre id="terminal-screen" tabindex="0" style="margin:0 0 8px 0; min-height:200px; max-height:260px; overflow:auto; font-size:0.64rem; line-height:1.35; font-family:'JetBrains Mono',Consolas,monospace; background:#0a0e14; color:#b8e986; padding:10px; border-radius:10px; white-space:pre-wrap; word-break:break-word; border:1px solid var(--border);"></pre>
+                        <input type="text" id="terminal-line" autocomplete="off" spellcheck="false" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.35); color:inherit;" placeholder="Scrivi comando e premi Invio…" disabled>
+                    </div>
                 </div>
 
                 <!-- Viewport Area -->
@@ -505,7 +528,9 @@
         const traceTableBodyEl = document.getElementById('trace-table-body');
         const traceDiffEl = document.getElementById('trace-diff');
         const connectBtn = document.getElementById('connect-btn');
-        let selectedMode = 'performance';
+        let selectedMode = 'auto_native';
+        let terminalSessionId = null;
+        let terminalShellConnected = false;
 
         function appendLog(msg, type='info') {
             const color = type === 'error' ? 'var(--danger)' : 'var(--text-secondary)';
@@ -805,6 +830,47 @@
                 } else if (data.type === 'file_list') renderFileList(data.path, data.items);
                 else if (data.type === 'clipboard_data') document.getElementById('clipboard-text').value = data.content;
                 else if (data.type === 'file_download') handleFileDownload(data);
+                else if (data.type === 'terminal_ready') {
+                    terminalShellConnected = true;
+                    if (data.session_id) terminalSessionId = data.session_id;
+                    const st = document.getElementById('terminal-status');
+                    if (st) { st.textContent = 'connected'; st.style.color = 'var(--success)'; }
+                    const ln = document.getElementById('terminal-line');
+                    if (ln) { ln.disabled = false; ln.focus(); }
+                    const cbtn = document.getElementById('terminal-connect');
+                    if (cbtn) cbtn.disabled = true;
+                    appendLog('Shell session ready (' + (data.shell || '?') + ').');
+                } else if (data.type === 'terminal_data') {
+                    if (data.session_id && terminalSessionId && data.session_id !== terminalSessionId) return;
+                    const sc = document.getElementById('terminal-screen');
+                    if (sc) {
+                        sc.appendChild(document.createTextNode(data.text || ''));
+                        sc.scrollTop = sc.scrollHeight;
+                    }
+                } else if (data.type === 'terminal_exit') {
+                    terminalShellConnected = false;
+                    const st = document.getElementById('terminal-status');
+                    if (st) { st.textContent = 'disconnected'; st.style.color = 'var(--warning)'; }
+                    const ln = document.getElementById('terminal-line');
+                    if (ln) ln.disabled = true;
+                    const cbtn = document.getElementById('terminal-connect');
+                    if (cbtn) cbtn.disabled = false;
+                    const sc = document.getElementById('terminal-screen');
+                    if (sc) {
+                        const tail = '\n--- session end code=' + data.code + (data.error ? ' ' + data.error : '') + ' ---\n';
+                        sc.appendChild(document.createTextNode(tail));
+                        sc.scrollTop = sc.scrollHeight;
+                    }
+                    appendLog('Shell session ended (code ' + data.code + ').');
+                } else if (data.type === 'terminal_result') {
+                    const sc = document.getElementById('terminal-screen');
+                    if (!sc) return;
+                    const head = '[exec exit ' + data.exit_code + '] ' + (data.elapsed_ms != null ? data.elapsed_ms + ' ms' : '') + '\n';
+                    const body = (data.stdout || '') + ((data.stderr && String(data.stderr).trim()) ? '\n--- stderr ---\n' + data.stderr : '');
+                    const tail = (data.truncated ? '\n[OUTPUT TRUNCATED]' : '') + (data.error ? '\n[agent] ' + data.error : '') + '\n';
+                    sc.appendChild(document.createTextNode(head + body + tail));
+                    sc.scrollTop = sc.scrollHeight;
+                }
             };
 
             ws.onerror = () => {
@@ -821,6 +887,14 @@
                 isConnecting = false;
                 connectBtn.disabled = false;
                 connectBtn.textContent = 'Establish Uplink';
+                terminalShellConnected = false;
+                terminalSessionId = null;
+                const tln = document.getElementById('terminal-line');
+                if (tln) tln.disabled = true;
+                const tc = document.getElementById('terminal-connect');
+                if (tc) tc.disabled = false;
+                const ts = document.getElementById('terminal-status');
+                if (ts) { ts.textContent = 'disconnected'; ts.style.color = 'var(--warning)'; }
                 if (socket === ws) socket = null;
             };
         }
@@ -934,6 +1008,55 @@
             appendLog("Clipboard buffer synchronized.");
         };
 
+        document.getElementById('terminal-connect').onclick = () => {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                appendLog('Relay offline.', 'error');
+                return;
+            }
+            terminalSessionId = 's_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+            const shell = (document.getElementById('terminal-shell') || {}).value || 'cmd';
+            const cwdRaw = (document.getElementById('terminal-cwd') && document.getElementById('terminal-cwd').value || '').trim();
+            const payload = { type: 'terminal_open', session_id: terminalSessionId, shell };
+            if (cwdRaw) payload.cwd = cwdRaw;
+            socket.send(JSON.stringify(payload));
+            const st = document.getElementById('terminal-status');
+            if (st) { st.textContent = 'connecting…'; st.style.color = 'var(--accent)'; }
+        };
+        document.getElementById('terminal-disconnect').onclick = () => {
+            if (socket && socket.readyState === WebSocket.OPEN && terminalSessionId) {
+                socket.send(JSON.stringify({ type: 'terminal_close', session_id: terminalSessionId }));
+            }
+            terminalShellConnected = false;
+            const ln = document.getElementById('terminal-line');
+            if (ln) ln.disabled = true;
+            const cbtn = document.getElementById('terminal-connect');
+            if (cbtn) cbtn.disabled = false;
+            const st = document.getElementById('terminal-status');
+            if (st) { st.textContent = 'disconnected'; st.style.color = 'var(--warning)'; }
+        };
+        document.getElementById('terminal-clear').onclick = () => {
+            const sc = document.getElementById('terminal-screen');
+            if (sc) sc.textContent = '';
+        };
+        document.getElementById('terminal-line').addEventListener('keydown', (e) => {
+            if (!terminalShellConnected || !socket || socket.readyState !== WebSocket.OPEN) return;
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                const raw = e.target.value;
+                socket.send(JSON.stringify({
+                    type: 'terminal_input',
+                    session_id: terminalSessionId,
+                    data: raw + '\r\n',
+                }));
+                e.target.value = '';
+                return;
+            }
+            if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+                e.preventDefault();
+                socket.send(JSON.stringify({ type: 'terminal_ctrl_c' }));
+            }
+        });
+
         function handleFileDownload(data) {
             appendLog(`Receiving file: ${data.filename}`);
             const byteCharacters = atob(data.data);
@@ -951,7 +1074,8 @@
         }
 
         // Interaction
-        window.addEventListener('keydown', (e) => { 
+        window.addEventListener('keydown', (e) => {
+            if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
             if (isStreaming && socket && socket.readyState === WebSocket.OPEN) {
                 socket.send(JSON.stringify({ type: 'keyboard_event', key: e.key, code: e.code }));
             }
