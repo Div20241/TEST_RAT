@@ -7,275 +7,322 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #05070a;
-            --surface: rgba(12, 14, 22, 0.92);
-            --accent: #00f2ff;
-            --accent-glow: rgba(0, 242, 255, 0.25);
+            --bg: #040609;
+            --surface: rgba(10, 13, 20, 0.94);
+            --surface-raised: rgba(15, 19, 28, 0.85);
+            --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.22);
             --secondary: #7c4dff;
             --success: #00e676;
             --warning: #ffab40;
             --danger: #ff5252;
-            --text-primary: #f0f4f8;
-            --text-secondary: #7b8ca8;
-            --border: rgba(255, 255, 255, 0.07);
+            --text-primary: #edf2f7;
+            --text-secondary: #6b7d99;
+            --border: rgba(255, 255, 255, 0.06);
+            --radius: 14px;
+            --sidebar-w: 320px;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.06) transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.05) transparent; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 10px; }
 
         body {
-            font-family: 'Outfit', sans-serif;
-            background: #05070a;
+            font-family: 'Outfit', system-ui, sans-serif;
+            background: var(--bg);
             color: var(--text-primary);
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
-            position: relative;
         }
 
-        .bg-mesh {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-        }
-        .bg-orb {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.12; animation: orbFloat 20s ease-in-out infinite alternate;
-        }
-        .bg-orb:nth-child(1) { width: 600px; height: 600px; background: var(--accent); top: -15%; left: -10%; }
-        .bg-orb:nth-child(2) { width: 500px; height: 500px; background: var(--secondary); bottom: -20%; right: -8%; animation-delay: -7s; animation-duration: 25s; }
-        .bg-orb:nth-child(3) { width: 350px; height: 350px; background: #e040fb; top: 50%; left: 40%; animation-delay: -12s; animation-duration: 30s; opacity: 0.06; }
-
+        .bg-mesh { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-orb { position: absolute; border-radius: 50%; filter: blur(130px); opacity: 0.10; will-change: transform; animation: orbFloat 22s ease-in-out infinite alternate; }
+        .bg-orb:nth-child(1) { width: 55vw; max-width: 650px; aspect-ratio: 1; background: var(--accent); top: -12%; left: -8%; }
+        .bg-orb:nth-child(2) { width: 45vw; max-width: 550px; aspect-ratio: 1; background: var(--secondary); bottom: -18%; right: -6%; animation-delay: -8s; animation-duration: 28s; }
+        .bg-orb:nth-child(3) { width: 30vw; max-width: 380px; aspect-ratio: 1; background: #e040fb; top: 45%; left: 38%; animation-delay: -14s; animation-duration: 34s; opacity: 0.05; }
         @keyframes orbFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(40px, -30px) scale(1.08); }
-            100% { transform: translate(-20px, 20px) scale(0.95); }
+            0%   { transform: translate(0, 0) scale(1); }
+            50%  { transform: translate(35px, -25px) scale(1.06); }
+            100% { transform: translate(-18px, 18px) scale(0.96); }
         }
 
         .glass-container {
             position: relative; z-index: 1;
-            width: 96%; max-width: 1440px; margin: 24px auto;
+            width: min(97%, 1520px); margin: 16px auto;
             background: var(--surface);
-            backdrop-filter: blur(24px) saturate(1.4);
+            backdrop-filter: blur(28px) saturate(1.5);
             border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 1.8rem 2rem;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.04);
-            animation: containerIn 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 22px;
+            padding: clamp(1rem, 2vw, 1.8rem) clamp(0.8rem, 2.5vw, 2rem);
+            box-shadow: 0 20px 70px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.03);
+            animation: containerIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
         }
-
         @keyframes containerIn {
-            from { opacity: 0; transform: translateY(24px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: 0; transform: translateY(20px) scale(0.985); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 1.6rem; padding-bottom: 1rem;
+            margin-bottom: 1.2rem; padding-bottom: 0.8rem;
             border-bottom: 1px solid var(--border);
+            flex-wrap: wrap; gap: 10px;
         }
-
         .logo {
-            font-size: 1.35rem; font-weight: 600; letter-spacing: 1px;
-            background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--secondary) 100%);
+            font-size: clamp(1rem, 2.5vw, 1.35rem); font-weight: 600; letter-spacing: 1.2px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent) 55%, var(--secondary) 100%);
             background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             display: flex; align-items: center; gap: 10px;
         }
-        .logo svg { filter: drop-shadow(0 0 6px var(--accent-glow)); }
+        .logo svg { filter: drop-shadow(0 0 6px var(--accent-glow)); flex-shrink: 0; }
 
         .status-badge {
             display: flex; align-items: center; gap: 8px;
-            padding: 7px 16px; border-radius: 30px;
-            background: rgba(0,0,0,0.35); font-size: 0.78rem; font-weight: 500;
-            border: 1px solid var(--border); backdrop-filter: blur(8px);
+            padding: 6px 14px; border-radius: 30px;
+            background: rgba(0,0,0,0.35); font-size: 0.72rem; font-weight: 500;
+            border: 1px solid var(--border); backdrop-filter: blur(6px);
             transition: all 0.4s;
         }
-        .status-dot {
-            height: 9px; width: 9px; background: #333; border-radius: 50%; transition: 0.4s;
-        }
-        .connected .status-dot {
-            background: var(--success); box-shadow: 0 0 10px var(--success);
-            animation: pulse 2s ease-in-out infinite;
-        }
+        .status-dot { height: 8px; width: 8px; background: #333; border-radius: 50%; transition: 0.4s; flex-shrink: 0; }
+        .connected .status-dot { background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s ease-in-out infinite; }
         .connected { border-color: rgba(0,230,118,0.2); }
-
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 6px var(--success); }
-            50% { box-shadow: 0 0 18px var(--success), 0 0 30px rgba(0,230,118,0.15); }
+            0%, 100% { box-shadow: 0 0 5px var(--success); }
+            50%      { box-shadow: 0 0 16px var(--success), 0 0 28px rgba(0,230,118,0.12); }
         }
 
         input, select, textarea {
-            background: rgba(0,0,0,0.35); border: 1px solid var(--border);
-            color: white; padding: 11px 16px; border-radius: 12px;
-            font-size: 0.9rem; outline: none; transition: all 0.3s;
-            font-family: 'Outfit', sans-serif;
+            background: rgba(0,0,0,0.32); border: 1px solid var(--border);
+            color: white; padding: 10px 14px; border-radius: var(--radius);
+            font-size: 0.85rem; outline: none; transition: all 0.25s;
+            font-family: 'Outfit', sans-serif; width: 100%;
         }
         input:focus, select:focus, textarea:focus {
-            border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(0,242,255,0.08);
+            border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow);
         }
+        select { cursor: pointer; }
 
         .btn {
-            cursor: pointer; padding: 11px 22px; border-radius: 12px;
-            font-weight: 600; border: none; font-size: 0.82rem;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer; padding: 10px 18px; border-radius: var(--radius);
+            font-weight: 600; border: none; font-size: 0.78rem;
+            text-transform: uppercase; letter-spacing: 0.7px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Outfit', sans-serif; position: relative; overflow: hidden;
+            white-space: nowrap;
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), var(--secondary));
-            color: #000; font-weight: 700;
-            box-shadow: 0 4px 20px var(--accent-glow);
+            color: #000; font-weight: 700; box-shadow: 0 3px 16px var(--accent-glow);
         }
-        .btn-primary:hover {
-            transform: translateY(-2px); filter: brightness(1.15);
-            box-shadow: 0 8px 35px var(--accent-glow);
-        }
+        .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.12); box-shadow: 0 6px 28px var(--accent-glow); }
         .btn-primary:active { transform: translateY(0); filter: brightness(0.95); }
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #d32f2f);
-            color: white; box-shadow: 0 4px 15px rgba(255,82,82,0.3);
-        }
-        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,82,82,0.4); }
+        .btn-primary:disabled { opacity: 0.45; pointer-events: none; }
+        .btn-danger { background: linear-gradient(135deg, var(--danger), #c62828); color: white; box-shadow: 0 3px 12px rgba(255,82,82,0.25); }
+        .btn-danger:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(255,82,82,0.35); }
 
         .dashboard-grid {
-            display: grid; grid-template-columns: 310px 1fr; gap: 20px;
+            display: grid; grid-template-columns: var(--sidebar-w) 1fr; gap: 16px;
+            min-height: 0;
         }
 
         .sidebar {
-            display: flex; flex-direction: column; gap: 14px;
-            max-height: calc(100vh - 140px); overflow-y: auto; padding-right: 4px;
+            display: flex; flex-direction: column; gap: 12px;
+            max-height: calc(100vh - 130px); max-height: calc(100dvh - 130px);
+            overflow-y: auto; padding-right: 4px;
         }
-        .sidebar::-webkit-scrollbar { width: 3px; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
 
         .card {
-            background: rgba(0,0,0,0.22);
-            border-radius: 16px; padding: 16px;
+            background: var(--surface-raised);
+            border-radius: var(--radius); padding: 14px;
             border: 1px solid var(--border);
-            transition: border-color 0.4s, box-shadow 0.4s;
-            animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+            transition: border-color 0.35s, box-shadow 0.35s;
+            animation: cardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
         }
-        .card:nth-child(1) { animation-delay: 0.05s; }
-        .card:nth-child(2) { animation-delay: 0.1s; }
-        .card:nth-child(3) { animation-delay: 0.15s; }
-        .card:nth-child(4) { animation-delay: 0.2s; }
-        .card:nth-child(5) { animation-delay: 0.25s; }
-
+        .card:nth-child(1) { animation-delay: 0.04s; }
+        .card:nth-child(2) { animation-delay: 0.08s; }
+        .card:nth-child(3) { animation-delay: 0.12s; }
+        .card:nth-child(4) { animation-delay: 0.16s; }
+        .card:nth-child(5) { animation-delay: 0.20s; }
+        .card:nth-child(6) { animation-delay: 0.24s; }
+        .card:nth-child(7) { animation-delay: 0.28s; }
         @keyframes cardIn {
-            from { opacity: 0; transform: translateX(-12px); }
-            to { opacity: 1; transform: translateX(0); }
+            from { opacity: 0; transform: translateX(-10px); }
+            to   { opacity: 1; transform: translateX(0); }
         }
-
-        .card:hover {
-            border-color: rgba(0,242,255,0.15);
-            box-shadow: 0 0 30px rgba(0,242,255,0.04);
-        }
+        .card:hover { border-color: rgba(0,229,255,0.13); box-shadow: 0 0 24px rgba(0,229,255,0.035); }
 
         .card-title {
-            font-size: 0.68rem; text-transform: uppercase;
-            color: var(--text-secondary); margin-bottom: 12px;
-            font-weight: 600; letter-spacing: 1.4px;
-            display: flex; align-items: center; gap: 8px;
+            font-size: 0.66rem; text-transform: uppercase;
+            color: var(--text-secondary); margin-bottom: 10px;
+            font-weight: 600; letter-spacing: 1.3px;
+            display: flex; align-items: center; gap: 7px;
         }
 
         .stat-value {
-            font-size: 2.2rem; font-weight: 700;
+            font-size: 2rem; font-weight: 700;
             font-family: 'JetBrains Mono', monospace;
             background: linear-gradient(135deg, var(--success), var(--accent));
             background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 8px rgba(0,230,118,0.2));
+            filter: drop-shadow(0 0 6px rgba(0,230,118,0.18));
             transition: filter 0.3s;
         }
 
         .stat-cell {
-            background: rgba(255,255,255,0.02);
-            border-radius: 10px; padding: 8px 6px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.03);
-            transition: border-color 0.3s, background 0.3s;
+            background: rgba(255,255,255,0.018); border-radius: 10px; padding: 7px 5px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.025);
+            transition: border-color 0.25s, background 0.25s;
         }
-        .stat-cell:hover {
-            border-color: rgba(0,242,255,0.12);
-            background: rgba(0,242,255,0.03);
-        }
-        .stat-cell-label {
-            font-size: 0.55rem; text-transform: uppercase;
-            letter-spacing: 1.2px; color: var(--text-secondary); margin-bottom: 3px;
-        }
-        .stat-cell-value {
-            font-size: 0.8rem; font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--accent); transition: color 0.3s;
-        }
+        .stat-cell:hover { border-color: rgba(0,229,255,0.1); background: rgba(0,229,255,0.025); }
+        .stat-cell-label { font-size: 0.52rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin-bottom: 2px; }
+        .stat-cell-value { font-size: 0.78rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+
+        .main-view { display: flex; flex-direction: column; min-width: 0; }
 
         .viewport-container {
             position: relative; background: #000;
-            border-radius: 20px; overflow: hidden;
+            border-radius: 16px; overflow: hidden;
             border: 1px solid var(--border);
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.6), 0 20px 60px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 16px 50px rgba(0,0,0,0.45);
             aspect-ratio: 16/9;
             display: flex; align-items: center; justify-content: center;
-            transition: border-color 0.5s, box-shadow 0.5s;
+            transition: border-color 0.4s, box-shadow 0.4s;
         }
         .viewport-container.streaming {
-            border-color: rgba(0,242,255,0.15);
-            box-shadow: inset 0 0 60px rgba(0,0,0,0.5), 0 0 40px rgba(0,242,255,0.06);
+            border-color: rgba(0,229,255,0.12);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.45), 0 0 32px rgba(0,229,255,0.05);
         }
 
         canvas { width: 100%; height: 100%; display: block; }
 
         .viewport-overlay {
-            position: absolute; top: 16px; right: 16px;
-            background: rgba(0,0,0,0.55); padding: 6px 12px;
-            border-radius: 8px; backdrop-filter: blur(8px);
-            font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
-            border: 1px solid rgba(255,255,255,0.06);
+            position: absolute; top: 12px; right: 12px;
+            background: rgba(0,0,0,0.55); padding: 5px 10px;
+            border-radius: 7px; backdrop-filter: blur(6px);
+            font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+            border: 1px solid rgba(255,255,255,0.05);
             color: var(--text-secondary); letter-spacing: 1px;
+            pointer-events: none;
         }
 
-        .explorer {
-            max-height: 220px; overflow-y: auto; margin-top: 8px; padding-right: 4px;
-        }
-        .explorer::-webkit-scrollbar { width: 3px; }
-        .explorer::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 10px; }
-
+        .explorer { max-height: 200px; overflow-y: auto; margin-top: 6px; }
         .file-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 12px; border-radius: 10px;
-            cursor: pointer; transition: all 0.2s;
-            font-size: 0.82rem; margin-bottom: 2px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px; border-radius: 8px;
+            cursor: pointer; transition: all 0.18s;
+            font-size: 0.78rem; margin-bottom: 1px;
         }
-        .file-item:hover {
-            background: rgba(124, 77, 255, 0.08); color: var(--accent);
-            transform: translateX(3px);
-        }
+        .file-item:hover { background: rgba(124, 77, 255, 0.07); color: var(--accent); transform: translateX(2px); }
 
         .console {
-            margin-top: 16px; background: rgba(0,0,0,0.6);
-            border-radius: 14px; padding: 14px 16px;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
-            color: var(--text-secondary); height: 100px;
+            margin-top: 12px; background: rgba(0,0,0,0.55);
+            border-radius: var(--radius); padding: 12px 14px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.66rem;
+            color: var(--text-secondary); height: 90px;
             overflow-y: auto; border: 1px solid var(--border);
-            line-height: 1.6; position: relative;
+            line-height: 1.55; position: relative;
         }
         .console::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
             background: linear-gradient(90deg, transparent, var(--accent), var(--secondary), transparent);
-            opacity: 0.3;
+            opacity: 0.25;
         }
 
         input[type=range] {
             width: 100%; accent-color: var(--accent); height: 4px;
             -webkit-appearance: none; appearance: none;
-            background: rgba(255,255,255,0.06); border-radius: 4px; border: none; outline: none;
+            background: rgba(255,255,255,0.05); border-radius: 4px; border: none; outline: none; padding: 0;
         }
         input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 14px; height: 14px;
+            -webkit-appearance: none; width: 13px; height: 13px;
             border-radius: 50%; background: var(--accent);
-            box-shadow: 0 0 8px var(--accent-glow);
+            box-shadow: 0 0 6px var(--accent-glow);
             cursor: pointer; border: 2px solid rgba(0,0,0,0.3);
         }
+        input[type=range]::-moz-range-thumb {
+            width: 13px; height: 13px; border-radius: 50%; background: var(--accent);
+            box-shadow: 0 0 6px var(--accent-glow); cursor: pointer; border: 2px solid rgba(0,0,0,0.3);
+        }
+
+        kbd { display: inline-block; background: rgba(255,255,255,0.07); border-radius: 4px; padding: 1px 5px; font-size: 0.62rem; font-family: 'JetBrains Mono', monospace; border: 1px solid var(--border); }
+        code { background: rgba(0,229,255,0.08); border-radius: 4px; padding: 1px 5px; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+
+        .field-label { display: block; font-size: 0.64rem; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 500; }
+        .range-value { font-size: 0.66rem; color: var(--accent); text-align: center; margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+        .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-row > * { flex: 1; min-width: 0; }
+        .btn-ghost { background: rgba(255,255,255,0.045); color: var(--text-primary); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.12); }
+        .btn-warn { background: rgba(255,82,82,0.15); color: var(--danger); border: 1px solid rgba(255,82,82,0.15); }
+        .btn-warn:hover { background: rgba(255,82,82,0.25); }
+        .checkbox-label { display: flex; align-items: center; gap: 7px; font-size: 0.66rem; color: var(--text-secondary); cursor: pointer; margin-top: 6px; }
+        .checkbox-label input[type=checkbox] { accent-color: var(--accent); flex-shrink: 0; }
+
+        .login-hero { text-align: center; margin-bottom: 2rem; }
+        .login-hero h1 { font-weight: 300; font-size: clamp(1.2rem, 4vw, 1.6rem); margin: 0 0 6px; }
+        .login-hero p { color: var(--text-secondary); margin: 0; font-size: 0.85rem; }
+        .login-form { max-width: 420px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+
+        .perf-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+        .perf-badge { margin-left: auto; font-size: 0.66rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; background: rgba(0,0,0,0.3); padding: 3px 8px; border-radius: 6px; }
+        .net-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 6px; }
+        .pkt-info { margin-top: 4px; font-size: 0.6rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; opacity: 0.65; }
+
+        .trace-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+        .trace-enable { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; color: var(--text-secondary); cursor: pointer; }
+        .trace-sort-wrap { display: flex; align-items: center; gap: 5px; }
+        .trace-sort-wrap label { font-size: 0.62rem; color: var(--text-secondary); }
+        .trace-sort-wrap select { padding: 2px 5px; font-size: 0.62rem; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; border-radius: 5px; width: auto; }
+        .trace-meta { margin-top: 4px; font-size: 0.62rem; color: var(--text-secondary); font-family: monospace; }
+        .trace-types { margin-top: 3px; display: flex; flex-wrap: wrap; gap: 3px; max-height: 50px; overflow: auto; }
+        .trace-table-wrap { margin-top: 6px; max-height: 140px; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.12); }
+        .trace-table { width: 100%; border-collapse: collapse; font-size: 0.62rem; font-family: 'JetBrains Mono', monospace; }
+        .trace-table thead tr { background: rgba(255,255,255,0.035); position: sticky; top: 0; }
+        .trace-table th { text-align: left; padding: 4px 5px; color: var(--accent); font-weight: 600; }
+
+        .path-display { font-size: 0.68rem; color: var(--accent); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; word-break: break-all; }
+
+        .term-status { font-size: 0.66rem; font-family: 'JetBrains Mono', monospace; }
+        .term-status.off { color: var(--warning); }
+        .term-status.on  { color: var(--success); }
+        .term-hint { font-size: 0.62rem; color: var(--text-secondary); margin-bottom: 6px; line-height: 1.45; }
+        .term-shell-select { font-size: 0.68rem; padding: 3px 7px; border-radius: 6px; border: 1px solid var(--border); background: rgba(0,0,0,0.25); color: inherit; width: auto; }
+        .term-screen {
+            margin: 0 0 8px; min-height: 180px; max-height: 280px;
+            overflow: auto; font-size: 0.63rem; line-height: 1.35;
+            font-family: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+            background: linear-gradient(180deg, #080c12 0%, #0a0e14 100%);
+            color: #c5e478; padding: 10px 12px; border-radius: 10px;
+            white-space: pre-wrap; word-break: break-word;
+            border: 1px solid var(--border);
+            box-shadow: inset 0 2px 12px rgba(0,0,0,0.4);
+        }
+        .term-input {
+            width: 100%; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; padding: 8px 10px; border-radius: 8px;
+            border: 1px solid var(--border); background: rgba(0,0,0,0.35); color: inherit;
+        }
+        .term-input:disabled { opacity: 0.4; }
 
         .hidden { display: none !important; }
 
+        @media (max-width: 1100px) { :root { --sidebar-w: 280px; } }
         @media (max-width: 900px) {
             .dashboard-grid { grid-template-columns: 1fr; }
-            .sidebar { max-height: none; overflow-y: visible; }
+            .sidebar { max-height: none; overflow-y: visible; order: 2; }
+            .main-view { order: 1; }
+            .glass-container { border-radius: 16px; margin: 8px; padding: 0.9rem; }
+            .term-screen { min-height: 140px; max-height: 220px; }
+        }
+        @media (max-width: 520px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .logo { font-size: 1rem; }
+            .viewport-container { aspect-ratio: auto; min-height: 180px; }
+            .btn { padding: 9px 12px; font-size: 0.72rem; }
+            input, select, textarea { padding: 9px 10px; font-size: 0.8rem; }
+            .field-grid { grid-template-columns: 1fr; }
+            .net-grid { grid-template-columns: repeat(2, 1fr); }
         }
     </style>
 </head>
@@ -293,22 +340,21 @@
             </div>
         </div>
 
-        <!-- Login / Entry Section -->
         <div id="login-section">
-            <div style="text-align:center; margin-bottom:2.5rem;">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="url(#grad1)" stroke-width="1.5" style="margin-bottom:16px;">
+            <div class="login-hero">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="url(#grad1)" stroke-width="1.5" style="margin-bottom:14px;">
                     <defs><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--accent)"/><stop offset="100%" style="stop-color:var(--secondary)"/></linearGradient></defs>
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
-                <h1 style="font-weight:300; margin:0 0 8px;">Access Remote Terminal</h1>
-                <p style="color:var(--text-secondary); margin:0;">Secure encrypted connection required</p>
+                <h1>Access Remote Terminal</h1>
+                <p>Secure encrypted connection required</p>
             </div>
-            <div style="max-width:420px; margin:0 auto; display:flex; flex-direction:column; gap:10px;">
-                <label style="font-size:0.7rem; color:var(--text-secondary); letter-spacing:0.5px;">AGENT ID</label>
+            <div class="login-form">
+                <label class="field-label">AGENT ID</label>
                 <input type="text" id="target-id" placeholder="PC_REMOTO_01" value="PC_REMOTO_01">
-                <label style="font-size:0.7rem; color:var(--text-secondary); letter-spacing:0.5px;">KEYPHRASE</label>
+                <label class="field-label">KEYPHRASE</label>
                 <input type="password" id="agent-password" placeholder="Enter passkey...">
-                <button id="connect-btn" class="btn btn-primary" style="margin-top:8px;">Establish Uplink</button>
+                <button id="connect-btn" class="btn btn-primary" style="margin-top:6px;">Establish Uplink</button>
             </div>
         </div>
 
@@ -317,60 +363,59 @@
             <div class="dashboard-grid">
                 <!-- Sidebar Controls -->
                 <div class="sidebar">
-
                     <div class="card">
                         <div class="card-title">🎬 Stream Controls</div>
-                        <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-bottom:6px;">ENGINE PRESET</label>
-                        <select id="stream-preset" style="width:100%; margin-bottom:12px;">
+                        <label class="field-label">ENGINE PRESET</label>
+                        <select id="stream-preset" style="margin-bottom:10px;">
                             <option value="fluid">FLUID FIRST (recommended)</option>
                             <option value="balanced">BALANCED</option>
                             <option value="quality" selected>QUALITY FIRST</option>
                         </select>
-                        <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-bottom:6px;">STREAM PROFILE (manual)</label>
-                        <select id="res-mode" style="width:100%; margin-bottom:14px;">
+                        <label class="field-label">STREAM PROFILE</label>
+                        <select id="res-mode" style="margin-bottom:10px;">
                             <option value="performance">PERFORMANCE (High FPS)</option>
                             <option value="ultra">ULTRA (Max FPS)</option>
                             <option value="quality">QUALITY (Best detail)</option>
                             <option value="auto_native" selected>AUTO NATIVE (Host 100%)</option>
                         </select>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                        <div class="field-grid">
                             <div>
-                                <label style="font-size:0.65rem; color:var(--text-secondary);">TARGET KB/frame</label>
+                                <label class="field-label">TARGET KB/frame</label>
                                 <input type="range" id="adaptive-target-kb" min="16" max="80" value="56">
-                                <div id="adaptive-target-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">56 KB/frame</div>
+                                <div id="adaptive-target-label" class="range-value">56 KB/frame</div>
                             </div>
                             <div>
-                                <label style="font-size:0.65rem; color:var(--text-secondary);">JPEG QUALITY</label>
+                                <label class="field-label">JPEG QUALITY</label>
                                 <input type="range" id="quality-range" min="10" max="95" value="80">
-                                <div id="quality-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">80%</div>
+                                <div id="quality-label" class="range-value">80%</div>
                             </div>
                         </div>
-                        <div style="margin-top:10px;">
-                            <label style="font-size:0.65rem; color:var(--text-secondary);">HOST SCALE</label>
+                        <div style="margin-top:8px;">
+                            <label class="field-label">HOST SCALE</label>
                             <input type="range" id="manual-scale" min="30" max="100" value="100">
-                            <div id="manual-scale-label" style="font-size:0.68rem; color:var(--accent); text-align:center;">100% (native host)</div>
+                            <div id="manual-scale-label" class="range-value">100% (native host)</div>
                         </div>
-                        <label style="display:flex; align-items:center; gap:8px; margin-top:8px; font-size:0.68rem; color:var(--text-secondary);">
-                            <input type="checkbox" id="adaptive-enabled" style="accent-color:var(--accent);"> Adaptive autoscale (optional)
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="adaptive-enabled"> Adaptive autoscale
                         </label>
-                        <label style="display:block; font-size:0.7rem; color:var(--text-secondary); margin-top:10px; margin-bottom:6px;">DISPLAY MODE</label>
-                        <select id="display-mode" style="width:100%;">
+                        <label class="field-label" style="margin-top:8px;">DISPLAY MODE</label>
+                        <select id="display-mode">
                             <option value="contain">Fit (keep aspect)</option>
                             <option value="cover">Fill (crop)</option>
                             <option value="stretch">Stretch</option>
                             <option value="pixel">1:1 Pixel</option>
                         </select>
-                        <button id="stream-btn" class="btn btn-primary" style="width:100%; margin-top:16px;">Initiate Stream</button>
+                        <button id="stream-btn" class="btn btn-primary" style="width:100%; margin-top:12px;">Initiate Stream</button>
                     </div>
 
                     <div class="card">
                         <div class="card-title">🚀 Performance</div>
-                        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;">
+                        <div class="perf-row">
                             <div class="stat-value"><span id="fps-counter">0</span></div>
-                            <small style="font-size:0.85rem; opacity:0.5;">FPS</small>
-                            <div id="stream-meta" style="margin-left:auto; font-size:0.68rem; color:var(--text-secondary); font-family:'JetBrains Mono',monospace; background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:8px;">IDLE</div>
+                            <small style="font-size:0.8rem; opacity:0.45;">FPS</small>
+                            <div id="stream-meta" class="perf-badge">IDLE</div>
                         </div>
-                        <div id="net-stats" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px;">
+                        <div id="net-stats" class="net-grid">
                             <div class="stat-cell"><div class="stat-cell-label">RTT</div><div class="stat-cell-value" id="st-rtt">-</div></div>
                             <div class="stat-cell"><div class="stat-cell-label">LOSS</div><div class="stat-cell-value" id="st-loss">0%</div></div>
                             <div class="stat-cell"><div class="stat-cell-label">DROP</div><div class="stat-cell-value" id="st-drop">0</div></div>
@@ -378,77 +423,59 @@
                             <div class="stat-cell"><div class="stat-cell-label">TX</div><div class="stat-cell-value" id="st-tx">0</div></div>
                             <div class="stat-cell"><div class="stat-cell-label">BUF</div><div class="stat-cell-value" id="st-buf">0 B</div></div>
                         </div>
-                        <div id="st-pkt" style="margin-top:6px; font-size:0.62rem; color:var(--text-secondary); font-family:'JetBrains Mono',monospace; padding:4px 0; opacity:0.7;"></div>
+                        <div id="st-pkt" class="pkt-info"></div>
                     </div>
 
                     <div class="card">
-                        <div class="card-title" style="margin-bottom:10px;">🔬 Packet Trace</div>
-                        <div style="display:flex; align-items:center; justify-content:space-between;">
-                            <label style="display:flex; align-items:center; gap:6px; font-size:0.72rem; color:var(--text-secondary); cursor:pointer;">
-                                <input type="checkbox" id="trace-flag" style="accent-color:var(--accent);"> Enable
-                            </label>
-                            <div style="display:flex; align-items:center; gap:6px;">
-                                <label style="font-size:0.65rem; color:var(--text-secondary);">Sort:</label>
-                                <select id="trace-sort" style="padding:3px 6px; font-size:0.65rem; background:rgba(0,0,0,0.3); border:1px solid var(--border); color:white; border-radius:6px;">
-                                    <option value="recent">Newest</option>
-                                    <option value="oldest">Oldest</option>
-                                    <option value="static">Static</option>
-                                </select>
+                        <div class="card-title">🔬 Packet Trace</div>
+                        <div class="trace-header">
+                            <label class="trace-enable"><input type="checkbox" id="trace-flag" style="accent-color:var(--accent);"> Enable</label>
+                            <div class="trace-sort-wrap">
+                                <label>Sort:</label>
+                                <select id="trace-sort"><option value="recent">Newest</option><option value="oldest">Oldest</option><option value="static">Static</option></select>
                             </div>
                         </div>
-                        <div id="trace-diff" style="margin-top:6px; font-size:0.65rem; color:var(--text-secondary); font-family:monospace; padding:4px 0;">TRACE DIFF: OFF</div>
-                        <div id="trace-types" style="margin-top:4px; display:flex; flex-wrap:wrap; gap:4px; max-height:60px; overflow:auto;"></div>
-                        <div style="margin-top:8px; max-height:150px; overflow:auto; border:1px solid var(--border); border-radius:10px; background:rgba(0,0,0,0.15);">
-                            <table style="width:100%; border-collapse:collapse; font-size:0.64rem; font-family:'JetBrains Mono',monospace;">
-                                <thead>
-                                    <tr style="background:rgba(255,255,255,0.04); position:sticky; top:0;">
-                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Time</th>
-                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Dir</th>
-                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Type</th>
-                                        <th style="text-align:left; padding:5px 6px; color:var(--accent);">Content</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="trace-table-body"></tbody>
-                            </table>
+                        <div id="trace-diff" class="trace-meta">TRACE DIFF: OFF</div>
+                        <div id="trace-types" class="trace-types"></div>
+                        <div class="trace-table-wrap">
+                            <table class="trace-table"><thead><tr><th>Time</th><th>Dir</th><th>Type</th><th>Content</th></tr></thead><tbody id="trace-table-body"></tbody></table>
                         </div>
                     </div>
 
                     <div class="card">
                         <div class="card-title">📁 Remote Explorer</div>
-                        <div id="current-path" style="font-size:0.7rem; color:var(--accent); margin-bottom:10px; font-family:monospace;">C:\</div>
+                        <div id="current-path" class="path-display">C:\</div>
                         <div class="explorer" id="file-list"></div>
                     </div>
 
                     <div class="card">
                         <div class="card-title">📋 Clipboard</div>
-                        <textarea id="clipboard-text" style="width:100%; height:55px; margin-bottom:10px; font-size:0.8rem;" placeholder="Remote clipboard..."></textarea>
-                        <div style="display:flex; gap:8px">
-                            <button id="get-clip-btn" class="btn" style="flex:1; background:rgba(255,255,255,0.05);">Pull</button>
-                            <button id="set-clip-btn" class="btn" style="flex:1; background:rgba(255,255,255,0.05);">Push</button>
+                        <textarea id="clipboard-text" style="height:50px; margin-bottom:8px; font-size:0.78rem;" placeholder="Remote clipboard..."></textarea>
+                        <div class="btn-row">
+                            <button id="get-clip-btn" class="btn btn-ghost">Pull</button>
+                            <button id="set-clip-btn" class="btn btn-ghost">Push</button>
                         </div>
                     </div>
 
                     <div class="card">
-                        <div class="card-title">🖥 Remote Shell (session)</div>
-                        <div style="font-size:0.65rem; color:var(--text-secondary); margin-bottom:8px;">
-                            Stile PuTTY: sessione <code>cmd</code> o <code>PowerShell</code> persistente. Invio = nuova riga al processo. <kbd>Ctrl+C</kbd> invia break.
-                        </div>
-                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
-                            <span id="terminal-status" style="font-size:0.68rem; font-family:monospace; color:var(--warning);">disconnected</span>
-                            <select id="terminal-shell" style="font-size:0.7rem; padding:4px 8px; border-radius:6px; border:1px solid var(--border); background:rgba(0,0,0,0.25); color:inherit;">
+                        <div class="card-title">🖥 Remote Shell</div>
+                        <div class="term-hint">Sessione <code>cmd</code> / <code>PowerShell</code> persistente. <kbd>Enter</kbd> invia, <kbd>Ctrl+C</kbd> break.</div>
+                        <div class="btn-row" style="align-items:center; margin-bottom:8px;">
+                            <span id="terminal-status" class="term-status off">disconnected</span>
+                            <select id="terminal-shell" class="term-shell-select">
                                 <option value="cmd">cmd.exe</option>
                                 <option value="powershell">PowerShell</option>
                             </select>
                         </div>
-                        <label style="display:block; font-size:0.65rem; color:var(--text-secondary); margin-bottom:4px;">CWD (solo all’apertura)</label>
-                        <input type="text" id="terminal-cwd" style="width:100%; margin-bottom:8px; font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:6px 8px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.25); color:inherit;" placeholder="C:\ (opzionale)">
-                        <div style="display:flex; gap:8px; margin-bottom:8px;">
-                            <button type="button" id="terminal-connect" class="btn btn-primary" style="flex:1;">Connect</button>
-                            <button type="button" id="terminal-disconnect" class="btn" style="flex:1; background:rgba(255,82,82,0.2);">Disconnect</button>
-                            <button type="button" id="terminal-clear" class="btn" style="flex:0.5; background:rgba(255,255,255,0.06);">Clear</button>
+                        <label class="field-label">CWD (on connect)</label>
+                        <input type="text" id="terminal-cwd" class="term-input" style="margin-bottom:8px;" placeholder="C:\ (optional)">
+                        <div class="btn-row" style="margin-bottom:8px;">
+                            <button type="button" id="terminal-connect" class="btn btn-primary">Connect</button>
+                            <button type="button" id="terminal-disconnect" class="btn btn-warn">Disconnect</button>
+                            <button type="button" id="terminal-clear" class="btn btn-ghost" style="flex:0.5;">Clear</button>
                         </div>
-                        <pre id="terminal-screen" tabindex="0" style="margin:0 0 8px 0; min-height:200px; max-height:260px; overflow:auto; font-size:0.64rem; line-height:1.35; font-family:'JetBrains Mono',Consolas,monospace; background:#0a0e14; color:#b8e986; padding:10px; border-radius:10px; white-space:pre-wrap; word-break:break-word; border:1px solid var(--border);"></pre>
-                        <input type="text" id="terminal-line" autocomplete="off" spellcheck="false" style="width:100%; font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.35); color:inherit;" placeholder="Scrivi comando e premi Invio…" disabled>
+                        <pre id="terminal-screen" tabindex="0" class="term-screen"></pre>
+                        <input type="text" id="terminal-line" autocomplete="off" spellcheck="false" class="term-input" placeholder="Scrivi comando e premi Invio…" disabled>
                     </div>
                 </div>
 
@@ -834,7 +861,7 @@
                     terminalShellConnected = true;
                     if (data.session_id) terminalSessionId = data.session_id;
                     const st = document.getElementById('terminal-status');
-                    if (st) { st.textContent = 'connected'; st.style.color = 'var(--success)'; }
+                    if (st) { st.textContent = 'connected'; st.className = 'term-status on'; }
                     const ln = document.getElementById('terminal-line');
                     if (ln) { ln.disabled = false; ln.focus(); }
                     const cbtn = document.getElementById('terminal-connect');
@@ -850,7 +877,7 @@
                 } else if (data.type === 'terminal_exit') {
                     terminalShellConnected = false;
                     const st = document.getElementById('terminal-status');
-                    if (st) { st.textContent = 'disconnected'; st.style.color = 'var(--warning)'; }
+                    if (st) { st.textContent = 'disconnected'; st.className = 'term-status off'; }
                     const ln = document.getElementById('terminal-line');
                     if (ln) ln.disabled = true;
                     const cbtn = document.getElementById('terminal-connect');
@@ -894,7 +921,7 @@
                 const tc = document.getElementById('terminal-connect');
                 if (tc) tc.disabled = false;
                 const ts = document.getElementById('terminal-status');
-                if (ts) { ts.textContent = 'disconnected'; ts.style.color = 'var(--warning)'; }
+                if (ts) { ts.textContent = 'disconnected'; ts.className = 'term-status off'; }
                 if (socket === ws) socket = null;
             };
         }
@@ -1020,7 +1047,7 @@
             if (cwdRaw) payload.cwd = cwdRaw;
             socket.send(JSON.stringify(payload));
             const st = document.getElementById('terminal-status');
-            if (st) { st.textContent = 'connecting…'; st.style.color = 'var(--accent)'; }
+            if (st) { st.textContent = 'connecting…'; st.className = 'term-status off'; }
         };
         document.getElementById('terminal-disconnect').onclick = () => {
             if (socket && socket.readyState === WebSocket.OPEN && terminalSessionId) {
@@ -1032,7 +1059,7 @@
             const cbtn = document.getElementById('terminal-connect');
             if (cbtn) cbtn.disabled = false;
             const st = document.getElementById('terminal-status');
-            if (st) { st.textContent = 'disconnected'; st.style.color = 'var(--warning)'; }
+            if (st) { st.textContent = 'disconnected'; st.className = 'term-status off'; }
         };
         document.getElementById('terminal-clear').onclick = () => {
             const sc = document.getElementById('terminal-screen');
